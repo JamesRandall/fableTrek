@@ -6,7 +6,7 @@ open App.Types
 open App.State
 open Fable.Core.JsInterop
 
-importSideEffects "../game.styl"
+importSideEffects "./game.styl"
 
 printfn "Loaded!"
 
