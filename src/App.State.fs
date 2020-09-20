@@ -23,9 +23,10 @@ let init _ =
 
 let update msg model =
   match (msg, model) with
-  // begin dispatcher update - do not remove
-  | (StartScreenDispatcherMsg msg, { StartScreen = Some extractedModel }) ->
-    let (subModel, subCmd) = Interface.StartScreen.State.update msg extractedModel
+  | (StartScreenDispatcherMsg subMsg, { StartScreen = Some extractedModel }) ->
+    let (subModel, subCmd) = Interface.StartScreen.State.update subMsg extractedModel
     { model with StartScreen = Some subModel}, Cmd.map StartScreenDispatcherMsg subCmd
-  | _ -> model, Cmd.none
+  | _ ->
+    console.error("Missing match in App.State")
+    model, Cmd.none
 

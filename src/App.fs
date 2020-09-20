@@ -8,8 +8,6 @@ open Fable.Core.JsInterop
 
 importSideEffects "./game.styl"
 
-printfn "Loaded!"
-
 let root model (dispatch:Msg->unit) =
   match model with
   | { CurrentPage = Router.Page.StartScreenPage ; StartScreen = Some extractedModel } ->
