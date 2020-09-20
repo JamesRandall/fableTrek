@@ -6,6 +6,7 @@ var path = require("path");
 var webpack = require("webpack")
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var { CleanWebpackPlugin } = require('clean-webpack-plugin');
 var isProduction = !process.argv.find(v => v.indexOf('webpack-dev-server') !== -1);
 
 if (isProduction)
@@ -28,7 +29,8 @@ var commonPlugins = [
     new HtmlWebpackPlugin({
         filename: 'index.html',
         template: resolve(CONFIG.indexTemplate)
-    })
+    }),
+    new CopyWebpackPlugin({ patterns: [ {from: resolve(CONFIG.assetsDir) }]})
 ];
 
 module.exports = {
@@ -41,14 +43,7 @@ module.exports = {
     },
     plugins:
         commonPlugins.concat(
-            isProduction ?
-                [
-                    new CopyWebpackPlugin({ patterns: [ {from: resolve(CONFIG.assetsDir) }]})
-                ] :
-                [
-                    new CopyWebpackPlugin({ patterns: [ {from: resolve(CONFIG.assetsDir) }]}),
-                    new webpack.HotModuleReplacementPlugin()
-                ]
+            isProduction ? [new CleanWebpackPlugin()] : [new webpack.HotModuleReplacementPlugin()]
         ),
     devServer: {
         publicPath: "/",
