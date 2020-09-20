@@ -14,7 +14,7 @@ let private toHash page =
   | StartScreenPage -> "#/"
   | GameScreenPage -> "#/game"
 
-let pageParser: Parser<Page->Page,Page> =
+let pageParser =
   oneOf [
     map GameScreenPage (s "game")
     map StartScreenPage top
