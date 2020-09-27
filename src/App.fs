@@ -13,8 +13,10 @@ let root model dispatch =
   div [Class "container"] [
     match model with
     | { CurrentPage = Router.Page.StartScreenPage ; StartScreen = Some extractedModel } ->
-      Interface.StartScreen.View.root model dispatch
-    | _ -> div [] [str "not found"]
+      Interface.StartScreen.View.root model (StartScreenDispatcherMsg >> dispatch)
+    | { CurrentPage = Router.Page.GameScreenPage ; GameScreen = Some extractedModel ; CurrentGame = Some extractedGame  } ->
+      Interface.GameScreen.View.root extractedGame extractedModel (GameScreenDispatcherMsg >> dispatch)
+    | _ -> div [Class "textError"] [str "not found"]
   ]
   
 

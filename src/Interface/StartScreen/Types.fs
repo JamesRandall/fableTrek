@@ -9,4 +9,4 @@ type Model =
     }
 
 type StartScreenMsg =
-  | NewGame
+  | StartNewGame of Game.Types.GameDifficulty

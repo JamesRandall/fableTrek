@@ -3,10 +3,20 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Game/Types.fs" />
+    <Compile Include="Game/Utils.fs" />
+    <Compile Include="Game/Factory.fs" />
+    <Compile Include="Game/State.fs" />
     <Compile Include="Router.fs" />
+    <Compile Include="Interface/Browser.Helpers.fs" />
     <Compile Include="Interface/StartScreen/Types.fs" />
     <Compile Include="Interface/StartScreen/State.fs" />
     <Compile Include="Interface/StartScreen/View.fs" />
+    <Compile Include="Interface/GameScreen/Types.fs" />
+    <Compile Include="Interface/GameScreen/State.fs" />
+    <Compile Include="Interface/GameScreen/Units.fs" />
+    <Compile Include="Interface/GameScreen/ShortRangeScanner.fs" />
+    <Compile Include="Interface/GameScreen/View.fs" />
     <Compile Include="App.Types.fs" />
     <Compile Include="App.State.fs" />
     <Compile Include="App.fs" />

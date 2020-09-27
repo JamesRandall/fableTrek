@@ -293,3 +293,6 @@ __pycache__/
 
 # Ignore bundle builds
 deploy
+
+.DS_Store
+._.DS_Store

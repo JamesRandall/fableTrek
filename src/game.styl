@@ -1,21 +1,171 @@
+@font-face 
+  font-family pixelatedBold
+  src url(../public/PixelOperator8-Bold.ttf)
+@font-face 
+  font-family pixelated
+  src url(../public/PixelOperator8.ttf)
+
+$gridSpacing = 20px
+
+panel(padding)
+  background-color: rgba(0,0,0,0.5)
+  border-color: white
+  border-style: solid 
+  border-width: 1px
+  padding: padding
+
+standardPaddedPanel()
+  panel(12px)
+
+retro-button(backgroundColor, hoverColor, disabledColor)
+  background-color: backgroundColor
+  border-color: white
+  border-style: solid 
+  border-width: 1px
+  border-radius: 2px
+  color: white
+  font-family: pixelatedBold 
+  font-size: 18px
+  padding: 9px
+  &:disabled
+    background-color: disabledColor
+    color: #333
+  &:hover:enabled
+    background-color: hoverColor
+    color: black
+  &:hover:active
+    background-color: white
+    color: backgroundColor
+
+text-outline(n)
+  text-shadow (- n) (- n) 0 #000, n (- n) 0 #000, (- n) n 0 #000, n n 0 #000
+
+html
+  margin 0
+  padding 0
+  background-color blue
+
 body
-  margin: 0
-  padding: 0
-  background-color: black
+  margin 0
+  padding 0
+  background-color black
+
+.textError
+  color: red
 
 .container
-  width: 100vw
-  height: 100vh
+  width 100vw
+  height 100vh
 
 .startScreen
-  height: 100%
-  display: grid
-  grid-template-rows: 33% 67%
+  background-image url('../public/background0.jpg')
+  background-size cover
+  background-repeat no-repeat
+  height 100%
+  display grid
+  grid-template-rows 33% 67%
 
   .title
+    display flex
+    flex-direction column
+    justify-content center
+    align-items center
+    color white
+    font-family pixelatedBold
+    font-size 48px
+    text-outline(2px)
+
+  .buttonContainer
     display: flex
     flex-direction: column
-    justify-content: center
     align-items: center
-    color: green
+    justify-content: flex-start
+    .buttons
+      standardPaddedPanel()
+      padding 16px 64px
+      display flex
+      flex-direction column
+      justify-content: flex-start
+
+      button:first-child
+        retro-button(#22f, #66f, #99f)
+        margin-top 16px
+        margin-bottom 16px
+
+      button
+        retro-button(#f22, #f66, #f99)
+        margin-top 16px
+        margin-bottom 16px
  
+.gameScreen
+  height 100%
+  //min-width: 800px
+  //min-height:  600px
+  background-image url('../public/background1.jpg')
+  background-size cover
+  background-repeat no-repeat
+  background-position: right center
+  
+  .outerContainer
+    padding: $gridSpacing
+    height: "calc(100% - %s)" % (2 * $gridSpacing) // calc(100% - 40px)
+    
+    .innerContainer
+      display grid
+      width: "calc(100% - %s)" % $gridSpacing
+      height 100%
+      grid-gap: $gridSpacing
+      grid-template-columns: 66% 34%
+      grid-template-rows: "calc(100% - 96px - 20px) 96px" % $gridSpacing
+    
+      .shortRangeScanner
+        panel (0)
+        grid-column: 1
+        grid-row: 1
+        position relative
+
+        .verticalLine
+          padding: 0px
+          margin: 0px
+          position: absolute
+          height: 100%
+          border-right-style: dashed
+          border-right-width: 2px
+          border-right-color: darkgreen
+          opacity: 0.5
+
+        .horizontalLine
+          padding: 0px
+          margin: 0px
+          position: absolute
+          width: 100%
+          border-bottom-style: dashed
+          border-bottom-width: 2px
+          border-bottom-color: darkgreen
+          opacity: 0.5
+
+        .overlayGrid
+          position: absolute
+          display grid
+          width 100%
+          height 100%
+          grid-gap: 0
+          cursor: grab
+
+        .gameObject
+          position: absolute
+          display: flex
+          flex-direction: column
+          justify-content: center
+          align-items: center
+
+      .bottomBar
+        standardPaddedPanel ()
+        grid-column: 1
+        grid-row: 2
+
+      .sideBar
+        standardPaddedPanel ()
+        grid-column: 2
+        grid-row-start: 1
+        grid-row-end: 3
