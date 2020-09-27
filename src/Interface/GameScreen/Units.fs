@@ -11,7 +11,7 @@ module Renderers =
   let private bgOpacity = 0.05
 
   let private unitSvg inner =
-    svg [ViewBox "0 0 100 100" ; SVGAttr.Width "auto" ; SVGAttr.Height "auto"] [
+    svg [Style [Width "100%" ; Height "100%"] ; ViewBox "0 0 100 100" ; SVGAttr.PreserveAspectRatio "xMinYMid keep"] [
       g [SVGAttr.Transform "translate(5,5) scale(0.9,0.9)"] inner
     ]
   
