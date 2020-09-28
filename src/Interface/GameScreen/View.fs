@@ -11,7 +11,14 @@ let root game model dispatch =
       div [Class "innerContainer"] [
         ShortRangeScanner.view {| gameObjects = game |> currentSectorObjects |> Seq.toArray |}
         div [Class "bottomBar"] []
-        div [Class "sideBar"] []
+        div [Class "sideBar"] [
+          div [Class "energy"] []
+          div [Class "weapons"] []
+          div [Class "fireButtons"] [
+            button [] [str "Fire Phasers"]
+            button [] [str "Fire Torpedoes"]
+          ]
+        ]
       ]
     ]
   ]    
