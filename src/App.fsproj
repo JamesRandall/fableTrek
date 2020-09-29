@@ -16,6 +16,7 @@
     <Compile Include="Interface/GameScreen/State.fs" />
     <Compile Include="Interface/GameScreen/Units.fs" />
     <Compile Include="Interface/GameScreen/ShortRangeScanner.fs" />
+    <Compile Include="Interface/GameScreen/EnergyManagement.fs" />
     <Compile Include="Interface/GameScreen/View.fs" />
     <Compile Include="App.Types.fs" />
     <Compile Include="App.State.fs" />

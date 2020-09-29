@@ -84,11 +84,12 @@ let renderGameObject go =
   match go.Attributes with
   | StarAttributes ->
     star
-  | PlayerAttributes _ ->
-    player
   | EnemyAttributes enemy ->
     match enemy.ShipClass with
     | Scout _ -> enemyScout
     | Cruiser _ -> enemyCruiser
     | Dreadnought _ -> enemyDreadnought
   | _ -> fragment [] []
+
+let renderPlayer () =
+  player

@@ -72,7 +72,8 @@ type Starbase =
   }
 
 type Player =
-  { Energy: EnergyLevel
+  { Position: GameWorldPosition
+    Energy: EnergyLevel
     ForeShields: EnergyLevel
     PortShields: EnergyLevel
     AftShields: EnergyLevel
@@ -87,11 +88,28 @@ type Player =
     Phasers: HitPoints
     TorpedoLaunchers: HitPoints
   }
+  static member Default =
+    {
+      Position = { GalacticPosition = { X = 0<coordinatecomponent> ; Y = 0<coordinatecomponent>} ; SectorPosition = { X = 0<coordinatecomponent> ; Y = 0<coordinatecomponent> }}
+      Energy = EnergyLevel.Create 5000.<gigawatt>
+      ForeShields = EnergyLevel.Create 1500.<gigawatt>
+      PortShields = EnergyLevel.Create 1000.<gigawatt>
+      AftShields = EnergyLevel.Create 1500.<gigawatt>
+      StarboardShields = EnergyLevel.Create 1000.<gigawatt>
+      Torpedos = Torpedos.Create 9<torpedo>
+      // Systems
+      Hull = HitPoints.Create 3000.<hitpoints>
+      WarpDrive = HitPoints.Create 1500.<hitpoints>
+      ShieldGenerator = HitPoints.Create 1500.<hitpoints>
+      EnergyConverter = HitPoints.Create 750.<hitpoints>
+      DeflectorDish = HitPoints.Create 1000.<hitpoints>
+      Phasers = HitPoints.Create 750.<hitpoints>
+      TorpedoLaunchers = HitPoints.Create 1000.<hitpoints>
+    }
 
 type GameObjectAttributes =
   | EnemyAttributes of Enemy
   | StarbaseAttributes of Starbase
-  | PlayerAttributes of Player
   | StarAttributes
 
 type GameObject =
@@ -105,7 +123,6 @@ type GameObject =
       | Scout -> "Scout"
       | Cruiser -> "Crusier"
       | Dreadnought -> "Dreadnought"
-    | PlayerAttributes _ -> "USS Discovery"
     | StarbaseAttributes _ -> "Starbase"
     | StarAttributes -> "Star"
 
@@ -118,13 +135,14 @@ type Game =
   { Difficulty: GameDifficulty
     Score: int
     GameObjects: GameObject array
+    Player: Player
   }
   static member Empty = {
     Difficulty = MediumDifficulty
     Score = 0
     GameObjects = Array.empty
+    Player = Player.Default
   }
-  member g.Player = g.GameObjects |> Seq.find (fun go -> match go.Attributes with | PlayerAttributes _ -> true | _ -> false)
 
 type GameMsg =
   | NewGame of GameDifficulty

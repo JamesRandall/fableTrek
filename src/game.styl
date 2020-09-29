@@ -67,7 +67,6 @@ text-outline(n)
 html
   margin 0
   padding 0
-  background-color blue
 
 body
   margin 0
@@ -78,6 +77,8 @@ body
   color: red
 
 .container
+  min-width 800px
+  min-height 600px
   width 100vw
   height 100vh
 
@@ -140,7 +141,7 @@ body
       height 100%
       grid-gap: $gridSpacing
       grid-template-columns: 66% 34%
-      grid-template-rows: "calc(100% - 96px - 20px) 96px" % $gridSpacing
+      grid-template-rows: "calc(100% - 72px - 20px) 72px" % $gridSpacing
     
       .shortRangeScanner
         panel (0)
@@ -191,28 +192,38 @@ body
       .sideBar
         grid-column: 2
         grid-row-start: 1
-        grid-row-end: 3
+        grid-row-end: 2
         display: flex
         flex-direction: column
         justify-content: flex-start
 
-        .energy
+        .energyManagement
           standardPaddedPanel ()
           margin-bottom: $gridSpacing
 
         .weapons
           standardPaddedPanel ()
           flex-grow: 1
-          margin-bottom: $gridSpacing
 
-        .fireButtons
-          standardPaddedPanel ()
-          display: grid
-          grid-auto-flow: column
-          grid-gap: ($gridSpacing / 2)
+      .fireButtons
+        grid-column: 2
+        grid-row-start: 2
+        grid-row-end: 3
+        standardPaddedPanel ()
+        padding-left: 16px
+        padding-right: 16px
+        display: grid
+        grid-auto-flow: column
+        grid-gap: ($gridSpacing / 2)
+        grid-template-columns: 50% 50%
 
-          button
-            retro-button(#f22, #f66, #f99)
-            //margin-top 16px
-            //margin-bottom 16px
+        div
+          display: flex
+          flex-direction: column
+          justify-content: center
+
+        button
+          retro-button(#f22, #f66, #f99)
+          //margin-top 16px
+          //margin-bottom 16px
 

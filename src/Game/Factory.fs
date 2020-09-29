@@ -61,26 +61,7 @@ let createGame difficulty =
         HitPoints = HitPoints.Create maxHitPoints
         RechargeRate = rechargeRate
       } |> StarbaseAttributes
-    createGameworldObjects numberOf createStarbase
-
-  let createPlayer =
-    let createPlayerRecord () =
-      { Energy = EnergyLevel.Create 5000.<gigawatt>
-        ForeShields = EnergyLevel.Create 1500.<gigawatt>
-        PortShields = EnergyLevel.Create 1000.<gigawatt>
-        AftShields = EnergyLevel.Create 1500.<gigawatt>
-        StarboardShields = EnergyLevel.Create 1000.<gigawatt>
-        Torpedos = Torpedos.Create 9<torpedo>
-        // Systems
-        Hull = HitPoints.Create 3000.<hitpoints>
-        WarpDrive = HitPoints.Create 1500.<hitpoints>
-        ShieldGenerator = HitPoints.Create 1500.<hitpoints>
-        EnergyConverter = HitPoints.Create 750.<hitpoints>
-        DeflectorDish = HitPoints.Create 1000.<hitpoints>
-        Phasers = HitPoints.Create 750.<hitpoints>
-        TorpedoLaunchers = HitPoints.Create 1000.<hitpoints>
-      } |> PlayerAttributes
-    createGameworldObjects 1 createPlayerRecord
+    createGameworldObjects numberOf createStarbase  
   
   let gameObjects =
     Seq.empty
@@ -89,12 +70,12 @@ let createGame difficulty =
     |> createEnemies Scout
     |> createEnemies Cruiser
     |> createEnemies Dreadnought
-    |> createPlayer
     |> Seq.toArray
   
   { Difficulty = difficulty
     Score = 0
     GameObjects = gameObjects
+    Player = { Player.Default with Position = findRandomAndVacantGalacticPosition gameObjects }
   }
 
 let canLoad () = not (localStorage.getItem("currentGame") |> isNull) 

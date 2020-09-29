@@ -9,15 +9,16 @@ let root game model dispatch =
   div [Class "gameScreen"] [
     div [Class "outerContainer"] [
       div [Class "innerContainer"] [
-        ShortRangeScanner.view {| gameObjects = game |> currentSectorObjects |> Seq.toArray |}
+        ShortRangeScanner.view {| gameObjects = game |> currentSectorObjects |> Seq.toArray ; player = game.Player |}
+        EnergyManagement.view {| player = game.Player |}
         div [Class "bottomBar"] []
         div [Class "sideBar"] [
           div [Class "energy"] []
           div [Class "weapons"] []
-          div [Class "fireButtons"] [
-            button [] [str "Fire Phasers"]
-            button [] [str "Fire Torpedoes"]
-          ]
+        ]
+        div [Class "fireButtons"] [
+          div[] [button [] [str "Fire Phasers"]]
+          div[] [button [] [str "Fire Torpedoes"]]
         ]
       ]
     ]

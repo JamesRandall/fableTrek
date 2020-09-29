@@ -3,11 +3,10 @@ module Interface.GameScreen.ShortRangeScanner
 open Fable.React
 open Fable.React.Props
 open Game.Types
-open Interface.Browser.Helpers
 open Units
 
 
-let view = FunctionComponent.Of(fun (props:{| gameObjects:GameObject array |}) ->
+let view = FunctionComponent.Of(fun (props:{| gameObjects:GameObject array ; player:Player |}) ->
   //let containerSize = Hooks.useState (0,0)
   let containerRef = Hooks.useRef None
 
@@ -29,6 +28,11 @@ let view = FunctionComponent.Of(fun (props:{| gameObjects:GameObject array |}) -
         div [Style [Height "80%" ; Width "80%"]] [go |> renderGameObject]
       ]
     )
+    |> Seq.append [
+      div [Class "gameObject" ; Style [getLeft props.player.Position.SectorPosition.X ; getTop props.player.Position.SectorPosition.Y ; cssWidth ; cssHeight ]] [
+        div [Style [Height "80%" ; Width "80%"]] [renderPlayer ()]
+      ]
+    ]
   
   let overlayGrid =
     let gridTemplateRows = (Seq.replicate numberOfRows (sprintf "%s " gridHeightPercentageAsString)) |> Seq.toArray |> Array.fold (+) ""
@@ -67,11 +71,4 @@ let view = FunctionComponent.Of(fun (props:{| gameObjects:GameObject array |}) -
     |> Seq.append verticalLines
     |> Seq.append horizontalLines    
   )
-  
-  
-  (*[
-
-    div [Style [CSSProp.Position PositionOptions.Absolute ; CSSProp.Left "90%" ; CSSProp.Width "10%" ; CSSProp.Height "10%" ; BackgroundColor "red"]] []
-    div [Style [CSSProp.Position PositionOptions.Absolute ; CSSProp.Left "20%" ; CSSProp.Width "10%" ; CSSProp.Height "10%" ; BackgroundColor "green"]] []  
-  ]*)
 )
