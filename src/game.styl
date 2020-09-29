@@ -6,6 +6,15 @@
   src url(../public/PixelOperator8.ttf)
 
 $gridSpacing = 20px
+$danger = rgb(230,3,3)
+$warning = rgb(252,186,3)
+$healthy = rgb(0,230,0)
+
+propertyGrid()
+  display: grid
+  grid-template-columns: 15ch auto
+  grid-auto-flow: row
+  grid-gap: 10px
 
 panel(padding)
   background-color: rgba(0,0,0,0.5)
@@ -130,6 +139,42 @@ body
   background-size cover
   background-repeat no-repeat
   background-position: right center
+
+  .levelIndicator
+    position relative
+    display: flex
+    justify-content: flex-start
+    align-items: center
+    .levelIndicatorBackground
+      flex-grow: 1
+      height: 8px
+      border-radius: 4px
+      background-color: rgba(0,0,0,0.4)
+      .levelIndicatorForegroundDanger
+        border-radius: 4px
+        height: 100%
+        background-color: $danger
+      .levelIndicatorForegroundWarning
+        border-radius: 4px
+        height: 100%
+        background-color: $warning
+      .levelIndicatorForegroundHealthy
+        border-radius: 4px
+        height: 100%
+        background-color: $healthy
+
+  .label
+    color: white
+    font-family: pixelated
+    font-size: 12px
+
+  .labelValuePair
+    color: white
+    font-family: pixelated
+    font-size: 12px
+    display: flex
+    flex-direction: row
+    justify-content: space-between
   
   .outerContainer
     padding: $gridSpacing
@@ -199,7 +244,19 @@ body
 
         .energyManagement
           standardPaddedPanel ()
+          propertyGrid ()
           margin-bottom: $gridSpacing
+          .shields
+            width: 100%
+            display: flex
+            flex-direction: column
+            div
+              margin-bottom: 5px
+            // display: grid
+            // grid-auto-flow: row
+            // grid-template-columns: 100%
+            // grid-gap: 10px
+            // align-items: start
 
         .weapons
           standardPaddedPanel ()

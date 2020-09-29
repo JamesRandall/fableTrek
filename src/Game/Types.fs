@@ -14,12 +14,15 @@ type torpedo
 
 type RangeValue<'T> when ^T : (static member (+) : ^T * ^T -> ^T )
                      and ^T : (static member (-) : ^T * ^T -> ^T )
+                     and ^T : (static member op_Explicit : ^T -> float)
                      and ^T : comparison =
   { Max: 'T
     Current: 'T
   }
+  member inline rt.Percentage = (rt.Current |> float)/(rt.Max |> float)
+  member inline rt.PercentageAsString = sprintf "%.0f" (rt.Percentage * 100.) 
   static member inline Create (withMax:^T) = { Max = withMax ; Current = withMax }
-  static member inline (+~) (e:RangeValue<'T>, value:'T)  = 
+  static member inline (+~) (e:RangeValue<'T>, value:^T)  = 
     let newValue = e.Current + value
     if newValue > e.Max then
       let overflow = newValue - e.Max
