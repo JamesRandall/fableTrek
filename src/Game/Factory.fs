@@ -75,7 +75,7 @@ let createGame difficulty =
   { Difficulty = difficulty
     Score = 0
     GameObjects = gameObjects
-    Player = { Player.Default with Position = findRandomAndVacantGalacticPosition gameObjects }
+    Player = { Player.Default with Position = findRandomAndVacantGalacticPosition gameObjects ; ForeShields = { Player.Default.ForeShields with Current = 900.<gigawatt>} }
   }
 
 let canLoad () = not (localStorage.getItem("currentGame") |> isNull) 

@@ -9,6 +9,7 @@
     <Compile Include="Game/State.fs" />
     <Compile Include="Router.fs" />
     <Compile Include="Interface/Browser.Helpers.fs" />
+    <Compile Include="Interface/Common.fs" />
     <Compile Include="Interface/StartScreen/Types.fs" />
     <Compile Include="Interface/StartScreen/State.fs" />
     <Compile Include="Interface/StartScreen/View.fs" />
