@@ -2,11 +2,16 @@ module Interface.Common
 open Fable.React
 open Fable.React.Props
 
+module Css =
+  let rgb r g b = sprintf "rgb(%d,%d,%d)" r g b
+  let rgba r g b a = sprintf "rgba(%d,%d,%d,%f)" r g b a
+
 module GameColors =
-  let danger = sprintf "rgba(230,3,3,%f)"
-  let warning = sprintf "rgba(252,186,3,%f)"
-  let healthy = sprintf "rgb(0,230,0,%f)"
-  let indicatorBackgroundColor = "rgba(0,0,0,0.4)"
+  open Css
+  let danger = rgba 230 3 3
+  let warning = rgba 252 186 3
+  let healthy = rgba 0 230 0
+  let indicatorBackgroundColor = rgba 0 0 0 0.4
 
 let labelAtRow row text =
   div [Class "label" ; Style [CSSProp.GridRow row]] [str text]

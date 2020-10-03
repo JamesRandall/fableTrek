@@ -1,0 +1,67 @@
+.gameScreen
+  height 100%
+  //min-width: 800px
+  //min-height:  600px
+  background-image url('../../public/background1.jpg')
+  background-size cover
+  background-repeat no-repeat
+  background-position: right center
+
+  .label
+    color: white
+    font-family: pixelated
+    font-size: 12px
+
+  .labelValuePair
+    color: white
+    font-family: pixelated
+    font-size: 12px
+    display: flex
+    flex-direction: row
+    justify-content: space-between
+  
+  .outerContainer
+    padding: $gridSpacing
+    height: "calc(100% - %s)" % (2 * $gridSpacing) // calc(100% - 40px)
+    
+    .innerContainer
+      display grid
+      width: "calc(100% - %s)" % $gridSpacing
+      height 100%
+      grid-gap: $gridSpacing
+      grid-template-columns: 66% 34%
+      grid-template-rows: "calc(100% - 72px - 20px) 72px" % $gridSpacing
+
+      .bottomBar
+        standardPaddedPanel ()
+        grid-column: 1
+        grid-row: 2
+
+      .sideBar
+        grid-column: 2
+        grid-row-start: 1
+        grid-row-end: 2
+        display: flex
+        flex-direction: column
+        justify-content: flex-start
+
+      .fireButtons
+        grid-column: 2
+        grid-row-start: 2
+        grid-row-end: 3
+        standardPaddedPanel ()
+        padding-left: 16px
+        padding-right: 16px
+        display: grid
+        grid-auto-flow: column
+        grid-gap: ($gridSpacing / 2)
+        grid-template-columns: 50% 50%
+
+        div
+          display: flex
+          flex-direction: column
+          justify-content: center
+
+        button
+          retro-button(#f22, #f66, #f99)
+

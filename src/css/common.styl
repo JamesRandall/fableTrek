@@ -1,0 +1,119 @@
+@font-face 
+  font-family pixelatedBold
+  src url(../../public/PixelOperator8-Bold.ttf)
+@font-face 
+  font-family pixelated
+  src url(../../public/PixelOperator8.ttf)
+
+$gridSpacing = 20px
+$danger = rgb(230,3,3)
+$warning = rgb(252,186,3)
+$healthy = rgb(0,230,0)
+$indicatorBackgroundColor = rgba(0,0,0,0.4)
+dangerAlpha(alpha)
+  rgba(230,3,3,alpha)
+
+propertyGrid()
+  display: grid
+  grid-template-columns: 16ch auto
+  grid-auto-flow: row
+  grid-row-gap: 15px
+  grid-column-gap: 10px
+
+panel(padding)
+  background-color: rgba(0,0,0,0.5)
+  border-color: white
+  border-style: solid 
+  border-width: 1px
+  padding: padding
+
+standardPaddedPanel()
+  panel(12px)
+
+retro-button(backgroundColor, hoverColor, disabledColor)
+  background-color: backgroundColor
+  border-style: none
+  border-radius: 2px
+  box-shadow: 3px 3px 3px #444
+  color: white
+  font-family: pixelatedBold 
+  font-size: 12px
+  padding: 9px 4px
+  margin-right: 2px
+  margin-bottom: 2px
+  margin-top: 0px
+  margin-left: 0px
+  &:disabled
+    background-color: disabledColor
+    color: #333
+  &:focus
+    outline: none
+  &:hover:active
+    box-shadow: none
+    margin-left: 2px
+    margin-right: 0px
+    margin-bottom: 0px
+    margin-top: 2px
+    
+
+retro-title-button(backgroundColor, hoverColor, disabledColor)
+  retro-button(backgroundColor, hoverColor, disabledColor)
+  font-family: pixelatedBold 
+  font-size: 18px  
+  padding: 9px
+  border-color: white
+  border-style: solid
+  border-width: 1px
+  border-radius: 2px
+  &:hover:enabled
+    background-color: hoverColor
+    color: black
+  &:hover:active
+    background-color: white
+    color: backgroundColor
+    box-shadow: none    
+    
+
+text-outline(n)
+  text-shadow (- n) (- n) 0 #000, n (- n) 0 #000, (- n) n 0 #000, n n 0 #000
+
+html
+  margin 0
+  padding 0
+
+body
+  margin 0
+  padding 0
+  background-color black
+
+.textError
+  color: red
+
+.container
+  min-width 800px
+  min-height 600px
+  width 100vw
+  height 100vh
+
+div.levelIndicator
+  position relative
+  display: flex
+  justify-content: flex-start
+  align-items: center
+  div.levelIndicatorBackground
+    flex-grow: 1
+    height: 8px
+    border-radius: 4px
+    background-color: $indicatorBackgroundColor
+    div.levelIndicatorForegroundDanger
+      border-radius: 4px
+      height: 100%
+      background-color: $danger
+    div.levelIndicatorForegroundWarning
+      border-radius: 4px
+      height: 100%
+      background-color: $warning
+    div.levelIndicatorForegroundHealthy
+      border-radius: 4px
+      height: 100%
+      background-color: $healthy

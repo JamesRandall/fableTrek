@@ -6,7 +6,7 @@ open Fable.React.Props
 open Game.Types
 
 module Renderers =
-
+  open Interface.Common.Css
   let private strokeWidth = 3.0
   let private bgOpacity = 0.1
 
@@ -24,8 +24,8 @@ module Renderers =
     unitSvg [
       path [
         SVGAttr.StrokeWidth strokeWidth
-        SVGAttr.Fill (sprintf "rgba(0,255,255,%f)" bgOpacity)
-        SVGAttr.Stroke (sprintf "rgba(0,255,255,%f)" opacity)
+        SVGAttr.Fill (rgba 0 255 255 bgOpacity)
+        SVGAttr.Stroke (rgba 0 255 255 opacity)
         D "M 50 0 L 25 58 L 0 50 L 25 100 L 50 83 L 75 100 L 100 50 L 75 58 L 50 0"] []
     ]
 
@@ -35,8 +35,8 @@ module Renderers =
     unitSvg [
       path [
         SVGAttr.StrokeWidth strokeWidth
-        SVGAttr.Fill (sprintf "rgba(255,0,0,%f)" bgOpacity)
-        SVGAttr.Stroke "rgb(255,0,0)"
+        SVGAttr.Fill (rgba 255 0 0 bgOpacity)
+        SVGAttr.Stroke (rgb 255 0 0)
         D "M 50 0 L 10 100 L 50 70 L 90 100 L 50 0"] []
     ]
 
@@ -44,8 +44,8 @@ module Renderers =
     unitSvg [
       path [
         SVGAttr.StrokeWidth strokeWidth
-        SVGAttr.Fill (sprintf "rgba(255,0,0,%f)" bgOpacity)
-        SVGAttr.Stroke "rgb(255,0,0)"
+        SVGAttr.Fill (rgba 255 0 0 bgOpacity)
+        SVGAttr.Stroke (rgb 255 0 0)
         D "M 50 0 L 0 90 L 40 100 L 60 100 L 100 90 L 50 0"] []
     ]
     
@@ -57,8 +57,8 @@ module Renderers =
         SVGAttr.Width 100
         SVGAttr.Height 100
         SVGAttr.StrokeWidth strokeWidth
-        SVGAttr.Fill (sprintf "rgba(255,0,0,%f)" bgOpacity)
-        SVGAttr.Stroke "rgb(255,0,0)"
+        SVGAttr.Fill (rgba 255 0 0 bgOpacity)
+        SVGAttr.Stroke (rgb 255 0 0)
       ] []
       rect [
         SVGAttr.X 10
@@ -66,8 +66,8 @@ module Renderers =
         SVGAttr.Width 30
         SVGAttr.Height 30
         SVGAttr.StrokeWidth strokeWidth
-        SVGAttr.Fill "rgba(0,0,0,0.5)"
-        SVGAttr.Stroke "rgb(255,128,0)"
+        SVGAttr.Fill (rgba 0 0 0 0.5)
+        SVGAttr.Stroke (rgb 255 128 0)
       ] []
       rect [
         SVGAttr.X 50
@@ -75,8 +75,8 @@ module Renderers =
         SVGAttr.Width 40
         SVGAttr.Height 40
         SVGAttr.StrokeWidth strokeWidth
-        SVGAttr.Fill "rgba(0,0,0,0.5)"
-        SVGAttr.Stroke "rgb(255,128,0)"
+        SVGAttr.Fill (rgba 0 0 0 0.5)
+        SVGAttr.Stroke (rgb 255 128 0)
       ] []
     ]
 

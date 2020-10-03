@@ -1,0 +1,40 @@
+.startScreen
+  background-image url('../../public/background0.jpg')
+  background-size cover
+  background-repeat no-repeat
+  height 100%
+  display grid
+  grid-template-rows 33% 67%
+
+  .title
+    display flex
+    flex-direction column
+    justify-content center
+    align-items center
+    color white
+    font-family pixelatedBold
+    font-size 48px
+    text-outline(2px)
+
+  .buttonContainer
+    display: flex
+    flex-direction: column
+    align-items: center
+    justify-content: flex-start
+    .buttons
+      standardPaddedPanel()
+      padding 16px 64px
+      display flex
+      flex-direction column
+      justify-content: flex-start
+
+      button:first-child
+        retro-title-button(#22f, #66f, #99f)
+        margin-top 16px
+        margin-bottom 16px
+
+      button
+        retro-title-button(#f22, #f66, #f99)
+        margin-top 16px
+        margin-bottom 16px
+ 
