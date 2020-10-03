@@ -4,21 +4,12 @@ open Fable.React
 open Fable.React.Props
 open Interface.Common
 
-let inline levelIndicator (rangeValue:RangeValue<'T>) =
-  let percentage = rangeValue.Percentage
-  let foregroundClass = "levelIndicatorForeground" + (if percentage > 0.5 then "Healthy" elif percentage > 0.25 then "Warning" else "Danger")
-  div [Class "levelIndicator"] [
-    div [Class "levelIndicatorBackground"] [
-      div [Class foregroundClass] []
-    ]
-  ]
-
 let inline shieldColor raised arcNumber (shieldLevel:RangeValue<'t>) =
   let opacity = if raised then 1.0 else 0.4
   let p = shieldLevel.Percentage
   let shieldArc = if p <= 0.25 then 0 elif p <= 0.5 then 1 elif p <=0.75 then 2 else 3
   if arcNumber > shieldArc then
-    "rgba(0,0,0,0.4)"
+    "rgba(255,0,0,0.2)"
   else
     let basedP = (p - (arcNumber|>float)*0.25) / (1. / 3.)
     opacity |> (if basedP <= 0.33 then GameColors.danger elif basedP <= 0.66 then GameColors.warning else GameColors.healthy)

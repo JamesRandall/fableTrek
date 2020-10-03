@@ -7,7 +7,7 @@ open App.Types
 open App.State
 open Fable.Core.JsInterop
 
-importSideEffects "./game.styl"
+importSideEffects "./css/game.styl"
 
 let root model dispatch =
   div [Class "container"] [
@@ -15,7 +15,7 @@ let root model dispatch =
     | { CurrentPage = Router.Page.StartScreenPage ; StartScreen = Some extractedModel } ->
       Interface.StartScreen.View.root model (StartScreenDispatcherMsg >> dispatch)
     | { CurrentPage = Router.Page.GameScreenPage ; GameScreen = Some extractedModel ; CurrentGame = Some extractedGame  } ->
-      Interface.GameScreen.View.root extractedGame extractedModel (GameScreenDispatcherMsg >> dispatch)
+      Interface.GameScreen.View.root extractedGame (GameDispatcherMsg >> dispatch) extractedModel (GameScreenDispatcherMsg >> dispatch)
     | _ -> div [Class "textError"] [str "not found"]
   ]
   

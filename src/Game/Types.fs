@@ -12,16 +12,28 @@ type coordinatecomponent
 [<Measure>]
 type torpedo
 
+[<Measure>]
+type celcius
+
+//let inline zero_of (target:^t) : ^t = LanguagePrimitives.GenericZero<'t>
+
 type RangeValue<'T> when ^T : (static member (+) : ^T * ^T -> ^T )
                      and ^T : (static member (-) : ^T * ^T -> ^T )
                      and ^T : (static member op_Explicit : ^T -> float)
+                     and ^T : (static member Zero: ^T)
                      and ^T : comparison =
   { Max: 'T
     Current: 'T
   }
+  member inline rt.Update (newValue:^T) =
+    let zero:'T = LanguagePrimitives.GenericZero<'T>
+    let rangeBoundValue =      
+      if newValue < zero then zero elif newValue > rt.Max then rt.Max else newValue
+    { rt with Current = rangeBoundValue }
   member inline rt.Percentage = (rt.Current |> float)/(rt.Max |> float)
   member inline rt.PercentageAsString = sprintf "%.0f" (rt.Percentage * 100.) 
-  static member inline Create (withMax:^T) = { Max = withMax ; Current = withMax }
+  static member inline Create withMax = { Max = withMax ; Current = withMax }
+  static member inline CreateAt withValue withMax = { Max = withMax ; Current = withValue }
   static member inline (+~) (e:RangeValue<'T>, value:^T)  = 
     let newValue = e.Current + value
     if newValue > e.Max then
@@ -35,6 +47,8 @@ type EnergyLevel = RangeValue<float<gigawatt>>
 type HitPoints = RangeValue<float<hitpoints>>
 
 type Torpedos = RangeValue<int<torpedo>>
+
+type TemperatureGauge = RangeValue<float<celcius>>
 
 type Position =
   {
@@ -83,6 +97,8 @@ type Player =
     AftShields: EnergyLevel
     StarboardShields: EnergyLevel
     Torpedos: Torpedos
+    PhaserPower: EnergyLevel
+    PhaserTemperature: TemperatureGauge
     // Systems
     Hull: HitPoints // what it says on the tin
     WarpDrive: HitPoints // enables warp travel
@@ -102,6 +118,8 @@ type Player =
       AftShields = EnergyLevel.Create 1500.<gigawatt>
       StarboardShields = EnergyLevel.Create 1000.<gigawatt>
       Torpedos = Torpedos.Create 9<torpedo>
+      PhaserPower = EnergyLevel.CreateAt 400.<gigawatt> 750.<gigawatt>
+      PhaserTemperature = EnergyLevel.CreateAt 0.<celcius> 10000.<celcius>
       // Systems
       Hull = HitPoints.Create 3000.<hitpoints>
       WarpDrive = HitPoints.Create 1500.<hitpoints>
@@ -149,5 +167,10 @@ type Game =
     Player = Player.Default
   }
 
+type UpdatePlayerStateMsg =
+  | SetPhaserPower of float<gigawatt>
+  | ToggleShields
+
 type GameMsg =
   | NewGame of GameDifficulty
+  | UpdatePlayerState of UpdatePlayerStateMsg

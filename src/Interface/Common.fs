@@ -37,3 +37,25 @@ let arc x y radius startAngle endAngle attributes =
       endY
       
   path ([(SVGAttr.D d) :> IProp] |> Seq.append attributes) []
+
+open Game.Types
+
+let inline genericLevelIndicator (rangeValue:RangeValue<'T>) foregroundClass =
+  div [Class "levelIndicator"] [
+    div [Class "levelIndicatorBackground"] [
+      div [Class foregroundClass ; Style [Width rangeValue.PercentageAsString]] []
+    ]
+  ]
+
+let inline invertedLevelIndicator (rangeValue:RangeValue<'T>) =
+  let percentage = rangeValue.Percentage
+  let foregroundClass = "levelIndicatorForeground" + (if percentage > 0.75 then "Danger" elif percentage > 0.50 then "Warning" else "Healthy")
+  genericLevelIndicator rangeValue foregroundClass 
+
+let inline levelIndicator (rangeValue:RangeValue<'T>) =
+  let percentage = rangeValue.Percentage
+  let foregroundClass = "levelIndicatorForeground" + (if percentage > 0.5 then "Healthy" elif percentage > 0.25 then "Warning" else "Danger")
+  genericLevelIndicator rangeValue foregroundClass 
+
+let inline rangeInput (range:RangeValue<'T>) onChange =
+  input [Type "range" ; Min 0 ; Max range.Max ; Value range.Current ; OnChange (fun ev -> onChange ev.Value)]

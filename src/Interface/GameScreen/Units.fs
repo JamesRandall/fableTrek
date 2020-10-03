@@ -8,7 +8,7 @@ open Game.Types
 module Renderers =
 
   let private strokeWidth = 3.0
-  let private bgOpacity = 0.05
+  let private bgOpacity = 0.1
 
   let private unitSvg inner =
     svg [Style [Width "100%" ; Height "100%"] ; ViewBox "0 0 100 100" ; SVGAttr.PreserveAspectRatio "xMinYMid keep"] [

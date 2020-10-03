@@ -5,7 +5,7 @@ open Fable.React
 open Fable.React.Props
 open Game.Utils.GameWorld
 
-let root game model dispatch =
+let root game gameDispatch model dispatch =
   div [Class "gameScreen"] [
     div [Class "outerContainer"] [
       div [Class "innerContainer"] [
@@ -13,7 +13,7 @@ let root game model dispatch =
         div [Class "bottomBar"] []
         div [Class "sideBar"] [
           EnergyManagement.view {| player = game.Player |}
-          div [Class "weapons"] []
+          Weapons.view {| player = game.Player ; gameDispatch = gameDispatch |}
         ]
         div [Class "fireButtons"] [
           div[] [button [] [str "Fire Phasers"]]
