@@ -20,14 +20,16 @@ module Renderers =
       circle [Cx 50 ; Cy 50 ; R 50 ; SVGAttr.Fill (sprintf "rgba(252,186,3,%f)" bgOpacity) ; SVGAttr.StrokeWidth strokeWidth ; SVGAttr.Stroke "rgb(252,186,3)"] []
     ]
 
-  let player =
+  let opaquePlayer opacity =
     unitSvg [
       path [
         SVGAttr.StrokeWidth strokeWidth
         SVGAttr.Fill (sprintf "rgba(0,255,255,%f)" bgOpacity)
-        SVGAttr.Stroke "rgb(0,255,255)"
+        SVGAttr.Stroke (sprintf "rgba(0,255,255,%f)" opacity)
         D "M 50 0 L 25 58 L 0 50 L 25 100 L 50 83 L 75 100 L 100 50 L 75 58 L 50 0"] []
     ]
+
+  let player = opaquePlayer 1.0
 
   let enemyScout =
     unitSvg [

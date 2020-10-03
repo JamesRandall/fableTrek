@@ -76,6 +76,7 @@ type Starbase =
 
 type Player =
   { Position: GameWorldPosition
+    ShieldsRaised: bool
     Energy: EnergyLevel
     ForeShields: EnergyLevel
     PortShields: EnergyLevel
@@ -94,6 +95,7 @@ type Player =
   static member Default =
     {
       Position = { GalacticPosition = { X = 0<coordinatecomponent> ; Y = 0<coordinatecomponent>} ; SectorPosition = { X = 0<coordinatecomponent> ; Y = 0<coordinatecomponent> }}
+      ShieldsRaised = true
       Energy = EnergyLevel.Create 5000.<gigawatt>
       ForeShields = EnergyLevel.Create 1500.<gigawatt>
       PortShields = EnergyLevel.Create 1000.<gigawatt>

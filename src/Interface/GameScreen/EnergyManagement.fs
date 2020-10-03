@@ -13,14 +13,15 @@ let inline levelIndicator (rangeValue:RangeValue<'T>) =
     ]
   ]
 
-let inline shieldColor arcNumber (shieldLevel:RangeValue<'t>) =
+let inline shieldColor raised arcNumber (shieldLevel:RangeValue<'t>) =
+  let opacity = if raised then 1.0 else 0.4
   let p = shieldLevel.Percentage
   let shieldArc = if p <= 0.25 then 0 elif p <= 0.5 then 1 elif p <=0.75 then 2 else 3
   if arcNumber > shieldArc then
     "rgba(0,0,0,0.4)"
   else
     let basedP = (p - (arcNumber|>float)*0.25) / (1. / 3.)
-    if basedP <= 0.33 then GameColors.danger elif basedP <= 0.66 then GameColors.warning else GameColors.healthy
+    opacity |> (if basedP <= 0.33 then GameColors.danger elif basedP <= 0.66 then GameColors.warning else GameColors.healthy)
 
 
 let shields player =
@@ -35,6 +36,8 @@ let shields player =
   let aftEnd = 223.
   
   let radii = [125. - shieldArcWidth ; 125. - shieldArcWidth*3. ; 125. - shieldArcWidth*5. ; 125. - shieldArcWidth*7.]
+
+  let shieldColor = shieldColor player.ShieldsRaised
 
   svg [Style [Width "100%" ; Height "100%"] ; ViewBox "0 0 250 250" ; SVGAttr.PreserveAspectRatio "xMinYMid keep"] (
     radii |> Seq.mapi(fun i r ->
@@ -52,14 +55,21 @@ let view = FunctionComponent.Of(fun (props:{| player:Player |}) ->
   div [Class "energyManagement"] [
     label "Main"
     levelIndicator props.player.Energy
-    div [Class "shields"] [
+    div [Class "shieldsProperties"] [
       div [Class "labelValuePair"] [label "Fore" ; label props.player.ForeShields.PercentageAsString]
       div [Class "labelValuePair"] [label "Star" ; label props.player.StarboardShields.PercentageAsString]
       div [Class "labelValuePair"] [label "Aft" ; label props.player.AftShields.PercentageAsString]
       div [Class "labelValuePair"] [label "Port" ; label props.player.PortShields.PercentageAsString]
     ]
-    div [Style [Height 250]] [
-      shields props.player
+    div [Class "shieldsContainer"] [
+      div [Class "shieldPlayerContainer"] [
+        div [Class "shieldsPlayer"] [
+          Units.Renderers.opaquePlayer 1.0
+        ]
+      ]
+      div [Class "shieldsGraphics"] [
+        shields props.player
+      ]
     ]
     label "Generators"
     levelIndicator props.player.ShieldGenerator

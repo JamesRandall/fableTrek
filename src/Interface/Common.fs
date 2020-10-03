@@ -3,9 +3,9 @@ open Fable.React
 open Fable.React.Props
 
 module GameColors =
-  let danger = "rgb(230,3,3)"
-  let warning = "rgb(252,186,3)"
-  let healthy = "rgb(0,230,0)"
+  let danger = sprintf "rgba(230,3,3,%f)"
+  let warning = sprintf "rgba(252,186,3,%f)"
+  let healthy = sprintf "rgb(0,230,0,%f)"
   let indicatorBackgroundColor = "rgba(0,0,0,0.4)"
 
 let labelAtRow row text =
