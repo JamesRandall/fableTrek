@@ -12,13 +12,15 @@ $healthy = rgb(0,230,0)
 $indicatorBackgroundColor = rgba(0,0,0,0.4)
 dangerAlpha(alpha)
   rgba(230,3,3,alpha)
+$propertyGridRowGap = 15px
+$propertyGridColGap = 10px
 
 propertyGrid()
   display: grid
   grid-template-columns: 16ch auto
   grid-auto-flow: row
-  grid-row-gap: 15px
-  grid-column-gap: 10px
+  grid-row-gap: $propertyGridRowGap
+  grid-column-gap: $propertyGridColGap
 
 panel(padding)
   background-color: rgba(0,0,0,0.5)

@@ -99,6 +99,7 @@ type Player =
     Torpedos: Torpedos
     PhaserPower: EnergyLevel
     PhaserTemperature: TemperatureGauge
+    Targets: GameWorldPosition list
     // Systems
     Hull: HitPoints // what it says on the tin
     WarpDrive: HitPoints // enables warp travel
@@ -120,6 +121,7 @@ type Player =
       Torpedos = Torpedos.Create 9<torpedo>
       PhaserPower = EnergyLevel.CreateAt 400.<gigawatt> 750.<gigawatt>
       PhaserTemperature = EnergyLevel.CreateAt 0.<celcius> 10000.<celcius>
+      Targets = List.empty
       // Systems
       Hull = HitPoints.Create 3000.<hitpoints>
       WarpDrive = HitPoints.Create 1500.<hitpoints>

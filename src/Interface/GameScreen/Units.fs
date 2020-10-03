@@ -17,7 +17,7 @@ module Renderers =
   
   let star =
     unitSvg [
-      circle [Cx 50 ; Cy 50 ; R 50 ; SVGAttr.Fill (sprintf "rgba(252,186,3,%f)" bgOpacity) ; SVGAttr.StrokeWidth strokeWidth ; SVGAttr.Stroke "rgb(252,186,3)"] []
+      circle [Cx 50 ; Cy 50 ; R 50 ; SVGAttr.Fill (rgba 252 186 3 bgOpacity) ; SVGAttr.StrokeWidth strokeWidth ; SVGAttr.Stroke "rgb(252,186,3)"] []
     ]
 
   let opaquePlayer opacity =

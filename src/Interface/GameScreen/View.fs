@@ -6,14 +6,15 @@ open Fable.React.Props
 open Game.Utils.GameWorld
 
 let root game gameDispatch model dispatch =
+  let currentObjects = game |> currentSectorObjects |> Seq.toArray
   div [Class "gameScreen"] [
     div [Class "outerContainer"] [
       div [Class "innerContainer"] [
-        ShortRangeScanner.view {| gameObjects = game |> currentSectorObjects |> Seq.toArray ; player = game.Player |}
+        ShortRangeScanner.view {| gameObjects = currentObjects ; player = game.Player |}
         div [Class "bottomBar"] []
         div [Class "sideBar"] [
           EnergyManagement.view {| player = game.Player |}
-          Weapons.view {| player = game.Player ; gameDispatch = gameDispatch |}
+          Weapons.view {| player = game.Player ; gameDispatch = gameDispatch ; gameObjects = currentObjects |}
         ]
         div [Class "fireButtons"] [
           div[] [button [] [str "Fire Phasers"]]

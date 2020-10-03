@@ -12,7 +12,22 @@ let torpedoesView (torpedoes:RangeValue<int<torpedo>>) =
     )
   )
 
-let view = FunctionComponent.Of(fun (props:{| player:Player ; gameDispatch:(GameMsg -> unit) |}) ->
+let targets (targets:GameWorldPosition list) gameObjects gameDispatch =
+  let acquiredTargets = targets |> Seq.map (fun target ->
+    div [Class "target"] []
+  )
+  let blankTargets = {(targets.Length)..2} |> Seq.map (fun target ->
+    div [Class "target"] []
+  )
+  div [Class "targets"] (blankTargets |> Seq.append acquiredTargets)
+  
+  (*[
+    div [Class "target"] []
+    div [Class "target"] []
+    div [Class "target"] []
+  ]*)
+
+let view = FunctionComponent.Of(fun (props:{| player:Player ; gameDispatch:(GameMsg -> unit) ; gameObjects:GameObject array |}) ->
   div [Class "weapons"] [
     div [Class "inner"] [
       label "Phaser Power"
@@ -26,6 +41,7 @@ let view = FunctionComponent.Of(fun (props:{| player:Player ; gameDispatch:(Game
       label "Launcher"
       levelIndicator props.player.TorpedoLaunchers
     ]
+    targets props.player.Targets props.gameObjects props.gameDispatch
   ]
 )
 

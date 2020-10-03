@@ -1,6 +1,8 @@
 .weapons
   standardPaddedPanel ()
   flex-grow: 1
+  display: flex
+  flex-direction: column
 
   .inner
     propertyGrid ()
@@ -21,3 +23,18 @@
 
     .torpedoInactive
       background-color: $indicatorBackgroundColor
+
+  .targets
+    flex-grow: 1
+    margin-top: $propertyGridRowGap
+    position relative
+    display grid
+    grid-template-columns: 1fr 1fr 1fr
+    grid-auto-flow: column
+    grid-column-gap: $propertyGridColGap
+      
+    .target
+      background-color: red
+      width: 100%
+      //padding-top: 100%
+      
