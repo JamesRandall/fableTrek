@@ -45,25 +45,27 @@ let shields player =
 
 let view = FunctionComponent.Of(fun (props:{| player:Player |}) ->
   div [Class "energyManagement"] [
-    label "Main"
-    levelIndicator props.player.Energy
-    div [Class "shieldsProperties"] [
-      div [Class "labelValuePair"] [label "Fore" ; label props.player.ForeShields.PercentageAsString]
-      div [Class "labelValuePair"] [label "Star" ; label props.player.StarboardShields.PercentageAsString]
-      div [Class "labelValuePair"] [label "Aft" ; label props.player.AftShields.PercentageAsString]
-      div [Class "labelValuePair"] [label "Port" ; label props.player.PortShields.PercentageAsString]
-    ]
-    div [Class "shieldsContainer"] [
-      div [Class "shieldPlayerContainer"] [
-        div [Class "shieldsPlayer"] [
-          Units.Renderers.opaquePlayer 1.0
+    div [Class "inner"] [
+      label "Main"
+      levelIndicator props.player.Energy
+      div [Class "shieldsProperties"] [
+        div [Class "labelValuePair"] [label "Fore" ; label props.player.ForeShields.PercentageAsString]
+        div [Class "labelValuePair"] [label "Star" ; label props.player.StarboardShields.PercentageAsString]
+        div [Class "labelValuePair"] [label "Aft" ; label props.player.AftShields.PercentageAsString]
+        div [Class "labelValuePair"] [label "Port" ; label props.player.PortShields.PercentageAsString]
+      ]
+      div [Class "shieldsContainer"] [
+        div [Class "shieldPlayerContainer"] [
+          div [Class "shieldsPlayer"] [
+            Units.Renderers.opaquePlayer 1.0
+          ]
+        ]
+        div [Class "shieldsGraphics"] [
+          shields props.player
         ]
       ]
-      div [Class "shieldsGraphics"] [
-        shields props.player
-      ]
+      label "Generators"
+      levelIndicator props.player.ShieldGenerator
     ]
-    label "Generators"
-    levelIndicator props.player.ShieldGenerator
   ]
 )

@@ -34,7 +34,19 @@
     grid-column-gap: $propertyGridColGap
       
     .target
-      background-color: red
+      position relative
       width: 100%
       //padding-top: 100%
       
+      .noTargetAcquiredLabel
+        font-family: pixelated
+        font-size: 10px
+        position absolute
+        color rgb(0,128,0)
+        top -3px
+        left 0px
+        right 0px
+        bottom 0px
+        display: flex
+        justify-content: center
+        align-items: center

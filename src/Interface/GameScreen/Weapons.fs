@@ -3,6 +3,20 @@ open Game.Types
 open Fable.React
 open Fable.React.Props
 open Interface.Common
+open Interface.Common.Css
+
+let noTargetAcquired =
+  [
+    svg [Style [Width "100%" ; Height "100%"] ; ViewBox "0 0 100 100" ; SVGAttr.PreserveAspectRatio "xMinYMid keep"] [
+      g [SVGAttr.Stroke (rgb 0 128 0) ; SVGAttr.StrokeWidth 2] [
+        path [D "M 40 1 L 60 1 M 50 1 L 50 15"] []
+        path [D "M 1 40 L 1 60 M 1 50 L 15 50"] []
+        path [D "M 40 99 L 60 99 M 50 99 L 50 85"] []
+        path [D "M 99 40 L 99 60 M 99 50 L 85 50"] []
+      ]
+    ]
+    div [Class "noTargetAcquiredLabel"] [str "No Target"]
+  ]
 
 let torpedoesView (torpedoes:RangeValue<int<torpedo>>) =
   div [Class "torpedoes"] (
@@ -17,7 +31,7 @@ let targets (targets:GameWorldPosition list) gameObjects gameDispatch =
     div [Class "target"] []
   )
   let blankTargets = {(targets.Length)..2} |> Seq.map (fun target ->
-    div [Class "target"] []
+    div [Class "target"] noTargetAcquired
   )
   div [Class "targets"] (blankTargets |> Seq.append acquiredTargets)
   
