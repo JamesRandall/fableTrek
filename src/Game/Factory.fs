@@ -72,11 +72,13 @@ let createGame difficulty =
     |> createEnemies Dreadnought
     |> Seq.toArray
   
-  { Difficulty = difficulty
-    Score = 0
-    GameObjects = gameObjects
-    Player = { Player.Default with Position = findRandomAndVacantGalacticPosition gameObjects ; ForeShields = { Player.Default.ForeShields with Current = 900.<gigawatt>} }
-  }
+  let gamePlayer = 
+    {
+      Player.Default with Position = findRandomAndVacantGalacticPosition gameObjects
+                          ForeShields = { Player.Default.ForeShields with Current = 900.<gigawatt>}
+    }
+    
+  { Game.Empty with Difficulty = difficulty ; GameObjects = gameObjects ; Player = gamePlayer }  
 
 let canLoad () = not (localStorage.getItem("currentGame") |> isNull) 
 

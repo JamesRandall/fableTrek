@@ -1,4 +1,5 @@
 .gameScreen
+  position relative
   height 100%
   //min-width: 800px
   //min-height:  600px
@@ -6,7 +7,16 @@
   background-size cover
   background-repeat no-repeat
   background-position: right center
-  
+
+  .transparentPopoverOverlay
+    position absolute
+    z-index: $overlayZIndex
+    top 0
+    left 0
+    bottom 0
+    right 0
+    background-color rgba(0,0,0,0.0)
+
   .outerContainer
     padding: $gridSpacing
     height: "calc(100% - %s)" % (2 * $gridSpacing) // calc(100% - 40px)

@@ -3,12 +3,33 @@ module Interface.GameScreen.ShortRangeScanner
 open Fable.React
 open Fable.React.Props
 open Game.Types
+open Game.Utils.Position
 open Units
+open Types
 
+module Menu = 
+  let items player optionalGameObject position =
+    match optionalGameObject with
+    | Some gameObject ->
+      match gameObject.Attributes with
+      | EnemyAttributes enemy ->
+        match player.Targets |> Seq.tryFind (fun p -> p = position) with
+        | Some _ -> [|("Remove target", position |> RemoveTarget) |> MenuItem|]
+        | None -> [|("Add target", position |> AddTarget) |> MenuItem|]
+      | StarbaseAttributes _ ->
+        match player.Position.GalacticPosition = position.GalacticPosition, isAdjacent player.Position.SectorPosition position.SectorPosition, Option.isNone player.DockedWith with
+        | true, true, true -> [|("Dock", position |> Dock) |> MenuItem|]
+        | true, true, false -> [|("Dock", Undock) |> MenuItem|]
+        | _ -> [|"Move next to the starbase to dock" |> NoActionLabel|]
+      | StarAttributes  -> [|"A star. A really big star." |> NoActionLabel|] 
+    | None -> [|("Move to", position |> MoveTo) |> MenuItem|]
 
-let view = FunctionComponent.Of(fun (props:{| gameObjects:GameObject array ; player:Player |}) ->
+  let view position menuItems =
+    div [] []  
+
+let view (gameObjects:GameObject array) (player:Player) menuItems dispatch =
   //let containerSize = Hooks.useState (0,0)
-  let containerRef = Hooks.useRef None
+  // let containerRef = Hooks.useRef None
 
   let gridWidthPercentage = 1. / ((GameWorldPosition.Max.SectorPosition.Y+1<coordinatecomponent>) |> float)
   let gridWidthPercentageAsString = sprintf "%f%%" (gridWidthPercentage * 100.)
@@ -22,14 +43,14 @@ let view = FunctionComponent.Of(fun (props:{| gameObjects:GameObject array ; pla
   let cssHeight = CSSProp.Height gridHeightPercentageAsString
 
   let renderedSectorObjects =
-    props.gameObjects
+    gameObjects
     |> Seq.map (fun go ->
       div [Class "gameObject" ; Style [getLeft go.Position.SectorPosition.X ; getTop go.Position.SectorPosition.Y ; cssWidth ; cssHeight ]] [
         div [Style [Height "80%" ; Width "80%"]] [go |> renderGameObject]
       ]
     )
     |> Seq.append [
-      div [Class "gameObject" ; Style [getLeft props.player.Position.SectorPosition.X ; getTop props.player.Position.SectorPosition.Y ; cssWidth ; cssHeight ]] [
+      div [Class "gameObject" ; Style [getLeft player.Position.SectorPosition.X ; getTop player.Position.SectorPosition.Y ; cssWidth ; cssHeight ]] [
         div [Style [Height "80%" ; Width "80%"]] [renderPlayer ()]
       ]
     ]
@@ -39,18 +60,31 @@ let view = FunctionComponent.Of(fun (props:{| gameObjects:GameObject array ; pla
     let gridTemplateColumns = (Seq.replicate numberOfColumns (sprintf "%s " gridWidthPercentageAsString)) |> Seq.toArray |> Array.fold (+) ""
     div [Class "overlayGrid" ; Style [CSSProp.GridTemplateRows gridTemplateRows ; CSSProp.GridTemplateColumns gridTemplateColumns ]] (
       Game.Utils.Position.sectorCoordinateIterator ()
-      |> Seq.map(fun (x,y) ->
+      |> Seq.map(fun clickedPosition ->
         div [
-          OnClick (fun _ -> Fable.Core.JS.console.log(sprintf "%d %d clicked" x y))
+          OnClick (fun _ ->
+            let clickedGameWorldPosition = { player.Position with SectorPosition = clickedPosition }
+            let objectAtPosition = gameObjects |> Seq.tryFind(fun go -> go.Position = clickedGameWorldPosition)
+            let menuItems = Menu.items player objectAtPosition clickedGameWorldPosition
+            (clickedGameWorldPosition, menuItems) |> ShowShortRangeScannerMenu |> dispatch)
           Style [
-            GridRowStart ((y|>int) + 1)
-            GridRowEnd ((y|>int) + 2)
-            GridColumnStart ((x|>int) + 1)
-            GridColumnEnd ((x|>int) + 2)
+            GridRowStart ((clickedPosition.Y|>int) + 1)
+            GridRowEnd ((clickedPosition.Y|>int) + 2)
+            GridColumnStart ((clickedPosition.X|>int) + 1)
+            GridColumnEnd ((clickedPosition.X|>int) + 2)
           ]
         ] [(*str (sprintf "%d,%d" x y)*)]
       )
     )
+
+  let menu =
+    match menuItems with
+    | Some items ->
+      let left = sprintf "%f%%" ((gridWidthPercentage * (items.Position.SectorPosition.X |> float) + gridWidthPercentage/2.)  * 100.)
+      let top = sprintf "%f%%" ((gridHeightPercentage * (items.Position.SectorPosition.Y |> float) + gridHeightPercentage/2.) * 100.)
+      div [Class "menu" ; Style [Left left ; Top top]] [str "hello"]
+    | None -> fragment [] []
+
 
   let verticalLines =
     { 0..(numberOfColumns-2) }
@@ -63,12 +97,12 @@ let view = FunctionComponent.Of(fun (props:{| gameObjects:GameObject array ; pla
     |> Seq.map(fun g ->
       let topPercentage = sprintf "%f%%" ((g |> float) / ((GameWorldPosition.Max.SectorPosition.Y+1<coordinatecomponent>) |> float) * 100.)
       div [Class "horizontalLine" ; Style [CSSProp.Top topPercentage ; cssHeight]] []
-    )
+    )    
 
-  div [Class "shortRangeScanner" ; RefHook containerRef] (
-    [overlayGrid]
+  div [Class "shortRangeScanner"] (
+    [menu]
+    |> Seq.append [overlayGrid]
     |> Seq.append renderedSectorObjects 
     |> Seq.append verticalLines
     |> Seq.append horizontalLines    
   )
-)

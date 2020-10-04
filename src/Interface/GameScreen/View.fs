@@ -5,12 +5,16 @@ open Fable.React
 open Fable.React.Props
 open Game.Utils.GameWorld
 
+let transparentPopoverOverlay onClose =
+  div [Class "transparentPopoverOverlay" ; OnClick (fun _ -> onClose ())] []
+
 let root game gameDispatch model dispatch =
   let currentObjects = game |> currentSectorObjects |> Seq.toArray
   div [Class "gameScreen"] [
+    match model.ShortRangeScannerMenuItems with | Some _ -> transparentPopoverOverlay (fun () -> HideShortRangeScannerMenu |> dispatch) | None -> fragment [] []
     div [Class "outerContainer"] [
       div [Class "innerContainer"] [
-        ShortRangeScanner.view {| gameObjects = currentObjects ; player = game.Player |}
+        ShortRangeScanner.view currentObjects game.Player model.ShortRangeScannerMenuItems dispatch
         div [Class "bottomBar"] []
         div [Class "sideBar"] [
           EnergyManagement.view {| player = game.Player |}

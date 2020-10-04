@@ -15,6 +15,12 @@ type torpedo
 [<Measure>]
 type celcius
 
+[<Measure>]
+type stardate
+
+[<Measure>]
+type score
+
 //let inline zero_of (target:^t) : ^t = LanguagePrimitives.GenericZero<'t>
 
 type RangeValue<'T> when ^T : (static member (+) : ^T * ^T -> ^T )
@@ -100,6 +106,7 @@ type Player =
     PhaserPower: EnergyLevel
     PhaserTemperature: TemperatureGauge
     Targets: GameWorldPosition list
+    DockedWith: GameWorldPosition option
     // Systems
     Hull: HitPoints // what it says on the tin
     WarpDrive: HitPoints // enables warp travel
@@ -122,6 +129,7 @@ type Player =
       PhaserPower = EnergyLevel.CreateAt 400.<gigawatt> 750.<gigawatt>
       PhaserTemperature = EnergyLevel.CreateAt 0.<celcius> 10000.<celcius>
       Targets = List.empty
+      DockedWith = None      
       // Systems
       Hull = HitPoints.Create 3000.<hitpoints>
       WarpDrive = HitPoints.Create 1500.<hitpoints>
@@ -158,20 +166,27 @@ type GameDifficulty =
 
 type Game =
   { Difficulty: GameDifficulty
-    Score: int
     GameObjects: GameObject array
     Player: Player
+    Stardate: float<stardate>
+    Score: int<score>
   }
   static member Empty = {
     Difficulty = MediumDifficulty
-    Score = 0
     GameObjects = Array.empty
     Player = Player.Default
+    Stardate = 2872.<stardate>
+    Score = 0<score>
   }
 
 type UpdatePlayerStateMsg =
   | SetPhaserPower of float<gigawatt>
   | ToggleShields
+  | MoveTo of GameWorldPosition
+  | AddTarget of GameWorldPosition
+  | RemoveTarget of GameWorldPosition
+  | Dock of GameWorldPosition
+  | Undock
 
 type GameMsg =
   | NewGame of GameDifficulty
