@@ -1,8 +1,6 @@
 .gameScreen
   position relative
-  height 100%
-  //min-width: 800px
-  //min-height:  600px
+  height 100%  
   background-image url('../../public/background1.jpg')
   background-size cover
   background-repeat no-repeat
@@ -23,10 +21,10 @@
     
     .innerContainer
       display grid
-      width: "calc(100% - %s)" % $gridSpacing
+      width: 100% // "calc(100% - %s)" % $gridSpacing
       height 100%
       grid-gap: $gridSpacing
-      grid-template-columns: 66% 34%
+      grid-template-columns: auto 400px
       grid-template-rows: "calc(100% - 72px - 20px) 72px" % $gridSpacing
 
       .bottomBar
@@ -35,9 +33,11 @@
         grid-row: 2
 
       .sideBar
+        overflow-y: auto
         grid-column: 2
         grid-row-start: 1
         grid-row-end: 2
+        //max-width: 300px
         display: flex
         flex-direction: column
         justify-content: flex-start
@@ -60,5 +60,5 @@
           justify-content: center
 
         button
-          retro-button(#f22, #f66, #f99)
+          retro-button(#f22, #f33, #900)
 

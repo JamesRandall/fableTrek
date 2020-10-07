@@ -34,11 +34,11 @@ panel(padding)
 standardPaddedPanel()
   panel(12px)
 
-retro-button(backgroundColor, hoverColor, disabledColor)
+retro-button(backgroundColor, hoverColor, disabledColor, shadowColor = #333)
   background-color: backgroundColor
   border-style: none
   border-radius: 2px
-  box-shadow: 3px 3px 3px #444
+  box-shadow: 3px 3px 3px shadowColor
   color: white
   font-family: pixelatedBold 
   font-size: 12px
@@ -49,7 +49,7 @@ retro-button(backgroundColor, hoverColor, disabledColor)
   margin-left: 0px
   &:disabled
     background-color: disabledColor
-    color: #333
+    color: #aaa
   &:focus
     outline: none
   &:hover:active
@@ -95,7 +95,7 @@ body
 
 .container
   min-width 800px
-  min-height 600px
+  min-height 712px
   width 100vw
   height 100vh
 

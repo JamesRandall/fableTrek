@@ -10,11 +10,13 @@ type ShortRangeScannerMenu =
 
 type Model =
   {
+    IsUiDisabled: bool
     IsLongRangeScannerVisible: bool
     ShortRangeScannerMenuItems: ShortRangeScannerMenu option
   }
   static member Empty =
-    { IsLongRangeScannerVisible = false
+    { IsUiDisabled = false
+      IsLongRangeScannerVisible = false
       ShortRangeScannerMenuItems = None
     }
 
@@ -23,3 +25,5 @@ type GameScreenMsg =
   | HideLongRangeScanner
   | ShowShortRangeScannerMenu of (GameWorldPosition*MenuItem array)
   | HideShortRangeScannerMenu
+  | DisableUi
+  | EnableUi

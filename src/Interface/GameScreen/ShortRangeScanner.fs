@@ -6,6 +6,7 @@ open Game.Types
 open Game.Utils.Position
 open Units
 open Types
+open Interface.Common
 
 module Menu = 
   let items player optionalGameObject position =
@@ -24,10 +25,22 @@ module Menu =
       | StarAttributes  -> [|"A star. A really big star." |> NoActionLabel|] 
     | None -> [|("Move to", position |> MoveTo) |> MenuItem|]
 
-  let view position menuItems =
-    div [] []  
+  let view menuOptions gameDispatch =
+    div [Class "menu menuCentered"] [
+      div [Class "menuArrowUpContainer"] [
+        div [Class "menuArrowUp"] []
+      ]
+      div [Class "menuBody"] (
+        menuOptions.MenuItems |>
+        Seq.map (fun mi ->
+          match mi with
+          | NoActionLabel text -> label text
+          | MenuItem (text, action) -> button [OnClick (fun _ -> action |> UpdatePlayerState |> gameDispatch)] [label text]
+        )
+      )
+    ]
 
-let view (gameObjects:GameObject array) (player:Player) menuItems dispatch =
+let view isUiDisabled (gameObjects:GameObject array) (player:Player) (menuItems:ShortRangeScannerMenu option) dispatch gameDispatch =
   //let containerSize = Hooks.useState (0,0)
   // let containerRef = Hooks.useRef None
 
@@ -50,7 +63,13 @@ let view (gameObjects:GameObject array) (player:Player) menuItems dispatch =
       ]
     )
     |> Seq.append [
-      div [Class "gameObject" ; Style [getLeft player.Position.SectorPosition.X ; getTop player.Position.SectorPosition.Y ; cssWidth ; cssHeight ]] [
+      div [Class "gameObject" ; Style [
+        Transition (sprintf "left %s, top %s" Interface.Animation.scannerAnimationDurationCss Interface.Animation.scannerAnimationDurationCss) 
+        getLeft player.Position.SectorPosition.X
+        getTop player.Position.SectorPosition.Y
+        cssWidth
+        cssHeight ]
+        ] [
         div [Style [Height "80%" ; Width "80%"]] [renderPlayer ()]
       ]
     ]
@@ -60,31 +79,38 @@ let view (gameObjects:GameObject array) (player:Player) menuItems dispatch =
     let gridTemplateColumns = (Seq.replicate numberOfColumns (sprintf "%s " gridWidthPercentageAsString)) |> Seq.toArray |> Array.fold (+) ""
     div [Class "overlayGrid" ; Style [CSSProp.GridTemplateRows gridTemplateRows ; CSSProp.GridTemplateColumns gridTemplateColumns ]] (
       Game.Utils.Position.sectorCoordinateIterator ()
-      |> Seq.map(fun clickedPosition ->
+      |> Seq.map(fun xyPosition ->
+        let gameWorldPosition = { player.Position with SectorPosition = xyPosition }
         div [
           OnClick (fun _ ->
-            let clickedGameWorldPosition = { player.Position with SectorPosition = clickedPosition }
-            let objectAtPosition = gameObjects |> Seq.tryFind(fun go -> go.Position = clickedGameWorldPosition)
-            let menuItems = Menu.items player objectAtPosition clickedGameWorldPosition
-            (clickedGameWorldPosition, menuItems) |> ShowShortRangeScannerMenu |> dispatch)
+            if isUiDisabled then
+              ()
+            else
+              match menuItems with
+              | Some _ -> ()
+              | None ->            
+                let objectAtPosition = gameObjects |> Seq.tryFind(fun go -> go.Position = gameWorldPosition)
+                let menuItems = Menu.items player objectAtPosition gameWorldPosition
+                (gameWorldPosition, menuItems) |> ShowShortRangeScannerMenu |> dispatch
+          )
           Style [
-            GridRowStart ((clickedPosition.Y|>int) + 1)
-            GridRowEnd ((clickedPosition.Y|>int) + 2)
-            GridColumnStart ((clickedPosition.X|>int) + 1)
-            GridColumnEnd ((clickedPosition.X|>int) + 2)
+            Position PositionOptions.Relative
+            GridRowStart ((xyPosition.Y|>int) + 1)
+            GridRowEnd ((xyPosition.Y|>int) + 2)
+            GridColumnStart ((xyPosition.X|>int) + 1)
+            GridColumnEnd ((xyPosition.X|>int) + 2)
           ]
-        ] [(*str (sprintf "%d,%d" x y)*)]
+        ] [
+          match menuItems with
+          | Some menu ->
+            if menu.Position = gameWorldPosition then 
+              Menu.view menu gameDispatch
+            else
+              fragment [] []
+          | None -> fragment [] []
+        ]
       )
     )
-
-  let menu =
-    match menuItems with
-    | Some items ->
-      let left = sprintf "%f%%" ((gridWidthPercentage * (items.Position.SectorPosition.X |> float) + gridWidthPercentage/2.)  * 100.)
-      let top = sprintf "%f%%" ((gridHeightPercentage * (items.Position.SectorPosition.Y |> float) + gridHeightPercentage/2.) * 100.)
-      div [Class "menu" ; Style [Left left ; Top top]] [str "hello"]
-    | None -> fragment [] []
-
 
   let verticalLines =
     { 0..(numberOfColumns-2) }
@@ -100,8 +126,7 @@ let view (gameObjects:GameObject array) (player:Player) menuItems dispatch =
     )    
 
   div [Class "shortRangeScanner"] (
-    [menu]
-    |> Seq.append [overlayGrid]
+    [overlayGrid]
     |> Seq.append renderedSectorObjects 
     |> Seq.append verticalLines
     |> Seq.append horizontalLines    

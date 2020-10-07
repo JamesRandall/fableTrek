@@ -4,6 +4,7 @@ open Fable.React
 open Fable.React.Props
 open Interface.Common
 open Interface.Common.Css
+open Interface.Browser.Helpers
 
 let inline shieldColor raised arcNumber (shieldLevel:RangeValue<'t>) =
   let opacity = if raised then 1.0 else 0.4
@@ -44,28 +45,40 @@ let shields player =
   )
 
 let view = FunctionComponent.Of(fun (props:{| player:Player |}) ->
+  let shieldContainerSize = Hooks.useState (0,0)
+  let shieldContainerRef = Hooks.useRef None
+
+  debouncedSize shieldContainerRef shieldContainerSize.update
+
+  
   div [Class "energyManagement"] [
     div [Class "inner"] [
-      label "Main"
-      levelIndicator props.player.Energy
-      div [Class "shieldsProperties"] [
-        div [Class "labelValuePair"] [label "Fore" ; label props.player.ForeShields.PercentageAsString]
-        div [Class "labelValuePair"] [label "Star" ; label props.player.StarboardShields.PercentageAsString]
-        div [Class "labelValuePair"] [label "Aft" ; label props.player.AftShields.PercentageAsString]
-        div [Class "labelValuePair"] [label "Port" ; label props.player.PortShields.PercentageAsString]
+      div [Class "innerTop"] [
+        label "Main"
+        levelIndicator props.player.Energy
       ]
-      div [Class "shieldsContainer"] [
-        div [Class "shieldPlayerContainer"] [
-          div [Class "shieldsPlayer"] [
-            Units.Renderers.opaquePlayer 1.0
+      div [Class "innerMiddle"] [
+        div [Class "shieldsProperties"] [
+          div [Class "labelValuePair"] [label "Fore" ; label props.player.ForeShields.PercentageAsString]
+          div [Class "labelValuePair"] [label "Star" ; label props.player.StarboardShields.PercentageAsString]
+          div [Class "labelValuePair"] [label "Aft" ; label props.player.AftShields.PercentageAsString]
+          div [Class "labelValuePair"] [label "Port" ; label props.player.PortShields.PercentageAsString]
+        ]
+        div [Class "shieldsContainer" ; RefHook shieldContainerRef] [
+          div [Class "shieldPlayerContainer"] [
+            div [Class "shieldsPlayer"] [
+              Units.Renderers.opaquePlayer 1.0
+            ]
+          ]
+          div [Class "shieldsGraphics" ; Style [Width (shieldContainerSize.current |> fst) ; Height (shieldContainerSize.current |> fst)]] [
+            shields props.player
           ]
         ]
-        div [Class "shieldsGraphics"] [
-          shields props.player
-        ]
       ]
-      label "Generators"
-      levelIndicator props.player.ShieldGenerator
+      div [Class "innerBottom"] [
+        label "Generators"
+        levelIndicator props.player.ShieldGenerator
+      ]
     ]
   ]
 )

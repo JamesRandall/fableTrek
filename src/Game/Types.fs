@@ -40,6 +40,8 @@ type RangeValue<'T> when ^T : (static member (+) : ^T * ^T -> ^T )
   member inline rt.PercentageAsString = sprintf "%.0f" (rt.Percentage * 100.) 
   static member inline Create withMax = { Max = withMax ; Current = withMax }
   static member inline CreateAt withValue withMax = { Max = withMax ; Current = withValue }
+  static member inline (-) (e:RangeValue<'T>, value: ^T) =
+    { e with Current = e.Current - value }
   static member inline (+~) (e:RangeValue<'T>, value:^T)  = 
     let newValue = e.Current + value
     if newValue > e.Max then
@@ -94,6 +96,11 @@ type Starbase =
     RechargeRate: float<gigawatt>
   }
 
+type CaptainsLogItem =
+  | Information of string
+  | Warning of string
+  | Danger of string
+
 type Player =
   { Position: GameWorldPosition
     ShieldsRaised: bool
@@ -107,6 +114,7 @@ type Player =
     PhaserTemperature: TemperatureGauge
     Targets: GameWorldPosition list
     DockedWith: GameWorldPosition option
+    CaptainsLog: CaptainsLogItem list
     // Systems
     Hull: HitPoints // what it says on the tin
     WarpDrive: HitPoints // enables warp travel
@@ -114,7 +122,7 @@ type Player =
     EnergyConverter: HitPoints // generates energy while warping
     DeflectorDish: HitPoints // prevents the ship from sustaining damage while warping
     Phasers: HitPoints
-    TorpedoLaunchers: HitPoints
+    TorpedoLaunchers: HitPoints    
   }
   static member Default =
     {
@@ -129,7 +137,8 @@ type Player =
       PhaserPower = EnergyLevel.CreateAt 400.<gigawatt> 750.<gigawatt>
       PhaserTemperature = EnergyLevel.CreateAt 0.<celcius> 10000.<celcius>
       Targets = List.empty
-      DockedWith = None      
+      DockedWith = None
+      CaptainsLog = []
       // Systems
       Hull = HitPoints.Create 3000.<hitpoints>
       WarpDrive = HitPoints.Create 1500.<hitpoints>

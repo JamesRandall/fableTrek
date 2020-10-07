@@ -1,3 +1,6 @@
+$menuBackground = rgba(0,0,0,0.8)
+$menuBorderColor = rgba(255,255,255,0.8)
+
 .shortRangeScanner
   panel (0)
   grid-column: 1
@@ -6,10 +9,45 @@
 
   .menu
     position absolute
-    background-color: white
-    width: 250px
+    width: 320px
     height: 100px
     z-index: $popoverZIndex
+    top: 66%
+
+    .menuArrowUpContainer
+      display: flex
+      justify-content: center
+      .menuArrowUp
+        width: 0; 
+        height: 0; 
+        border-left: 15px solid transparent
+        border-right: 15px solid transparent  
+        border-bottom: 15px solid $menuBackground
+
+    .menuBody
+      background-color: $menuBackground
+      border-radius: 4px
+      //border-left: 1px solid $menuBorderColor
+      //border-right: 1px solid $menuBorderColor
+      //border-bottom: 1px solid $menuBorderColor
+      padding: 2ch
+      display: flex
+      flex-direction: column
+      justify-content: flex-start
+      align-items: stretch
+      box-shadow: 3px 3px 3px #111
+
+      button 
+        display: block
+        retro-button(#333, #444, #666, #222)
+
+    
+  .menuCentered    
+    left: 50%    
+    transform: translateX(-50%)    
+
+  .menuLeft
+    left: 66%
 
   .verticalLine
     padding: 0px
