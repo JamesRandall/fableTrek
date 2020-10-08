@@ -5,6 +5,7 @@
   <ItemGroup>
     <Compile Include="Game/Types.fs" />
     <Compile Include="Game/Utils.fs" />
+    <Compile Include="Game/Rules.fs" />
     <Compile Include="Game/Factory.fs" />
     <Compile Include="Game/State.fs" />
     <Compile Include="Router.fs" />

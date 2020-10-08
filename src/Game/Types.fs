@@ -63,6 +63,7 @@ type Position =
     X: int<coordinatecomponent>
     Y: int<coordinatecomponent>
   }
+  member p.AsString = sprintf "%d,%d" p.X p.Y
   member p.DistanceTo position =
     ((position.X - p.X)*(position.X - p.X))+((position.Y - p.Y)*(position.Y - p.Y)) |> float |> sqrt
 
@@ -71,6 +72,7 @@ type GameWorldPosition =
     GalacticPosition: Position
     SectorPosition: Position
   }
+  member p.AsString = sprintf "%s,%s" p.GalacticPosition.AsString p.SectorPosition.AsString
   static member Max =
     { GalacticPosition = { X = 7<coordinatecomponent> ; Y = 7<coordinatecomponent>}
       SectorPosition = { X = 7<coordinatecomponent> ; Y = 7<coordinatecomponent> }
@@ -118,11 +120,14 @@ type Player =
     // Systems
     Hull: HitPoints // what it says on the tin
     WarpDrive: HitPoints // enables warp travel
+    ImpulseDrive: HitPoints // enables impulse movement
     ShieldGenerator: HitPoints // what it says on the tin
     EnergyConverter: HitPoints // generates energy while warping
     DeflectorDish: HitPoints // prevents the ship from sustaining damage while warping
     Phasers: HitPoints
-    TorpedoLaunchers: HitPoints    
+    TorpedoLaunchers: HitPoints
+    // Energy costs
+    ImpulseMovementCost: float<gigawatt>
   }
   static member Default =
     {
@@ -142,11 +147,14 @@ type Player =
       // Systems
       Hull = HitPoints.Create 3000.<hitpoints>
       WarpDrive = HitPoints.Create 1500.<hitpoints>
+      ImpulseDrive = HitPoints.Create 1500.<hitpoints>
       ShieldGenerator = HitPoints.Create 1500.<hitpoints>
       EnergyConverter = HitPoints.Create 750.<hitpoints>
       DeflectorDish = HitPoints.Create 1000.<hitpoints>
       Phasers = HitPoints.Create 750.<hitpoints>
       TorpedoLaunchers = HitPoints.Create 1000.<hitpoints>
+      // Energy costs
+      ImpulseMovementCost = 50.<gigawatt>
     }
 
 type GameObjectAttributes =
@@ -167,6 +175,7 @@ type GameObject =
       | Dreadnought -> "Dreadnought"
     | StarbaseAttributes _ -> "Starbase"
     | StarAttributes -> "Star"
+  member x.IsEnemy = match x.Attributes with | EnemyAttributes _ -> true | _ -> false
 
 type GameDifficulty =
   | EasyDifficulty

@@ -12,6 +12,9 @@ module GameWorld =
   let positionInCurrentSector game position =
     { game.Player.Position with SectorPosition = position}
 
+  let objectAtPosition game position =
+    game |> currentSectorObjects |> Seq.tryFind(fun go -> go.Position = position)
+
 module Position =
   let private random = System.Random(1) // always seed it with the same number while developing! Makes for a fixed predictable game.
   
@@ -49,23 +52,6 @@ module Position =
     position1.Y >= (position2.Y-1<coordinatecomponent>)
     
 
-module Player =
-  let energyRequirementsForMove (player:Player) newPosition =
-    if newPosition.GalacticPosition = player.Position.GalacticPosition then
-      // we're moving within a sector
-      500.<gigawatt>
-    else
-      1000.<gigawatt>
-
-  let move player gameObjects newPosition =
-    let energyRequirements = energyRequirementsForMove player newPosition
-    match player.Energy.Current > energyRequirements, (Position.positionIsVacant gameObjects newPosition) with
-    | true, true ->
-      Ok { player with Energy = player.Energy - energyRequirements ; Position = newPosition } 
-    | false, _ ->
-      Error "Insufficient energy to move to that location"
-    | _, false ->
-      Error "Object blocking move"
 
     
 

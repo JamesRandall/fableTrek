@@ -46,7 +46,7 @@ let preGameUpdateMessage gameDispatcherMsg =
   match gameDispatcherMsg with
   | UpdatePlayerState subMsg ->
     match subMsg with
-    | MoveTo _ | AddTarget _ ->
+    | MoveTo _ ->
       Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg DisableUi)
     | _ -> Cmd.none
   | _ -> Cmd.none

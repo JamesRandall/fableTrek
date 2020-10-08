@@ -4,6 +4,8 @@ open Fable.React
 open Fable.React.Props
 open Game.Types
 open Game.Utils.Position
+open Game.Rules.Movement
+open Game.Rules.Weapons
 open Units
 open Types
 open Interface.Common
@@ -16,14 +18,22 @@ module Menu =
       | EnemyAttributes enemy ->
         match player.Targets |> Seq.tryFind (fun p -> p = position) with
         | Some _ -> [|("Remove target", position |> RemoveTarget) |> MenuItem|]
-        | None -> [|("Add target", position |> AddTarget) |> MenuItem|]
+        | None -> 
+          if canAddTarget player gameObject then
+            [|("Add target", position |> AddTarget) |> MenuItem|]
+          else
+            [|"Cannot add more targets" |> NoActionLabel|]
       | StarbaseAttributes _ ->
         match player.Position.GalacticPosition = position.GalacticPosition, isAdjacent player.Position.SectorPosition position.SectorPosition, Option.isNone player.DockedWith with
         | true, true, true -> [|("Dock", position |> Dock) |> MenuItem|]
         | true, true, false -> [|("Dock", Undock) |> MenuItem|]
         | _ -> [|"Move next to the starbase to dock" |> NoActionLabel|]
       | StarAttributes  -> [|"A star. A really big star." |> NoActionLabel|] 
-    | None -> [|("Move to", position |> MoveTo) |> MenuItem|]
+    | None ->
+      if canMove player position then
+        [|("Move to", position |> MoveTo) |> MenuItem|]
+      else
+        [|"Insufficient energy to move here" |> NoActionLabel |]
 
   let view menuOptions gameDispatch =
     div [Class "menu menuCentered"] [
@@ -91,7 +101,7 @@ let view isUiDisabled (gameObjects:GameObject array) (player:Player) (menuItems:
               | None ->            
                 let objectAtPosition = gameObjects |> Seq.tryFind(fun go -> go.Position = gameWorldPosition)
                 let menuItems = Menu.items player objectAtPosition gameWorldPosition
-                (gameWorldPosition, menuItems) |> ShowShortRangeScannerMenu |> dispatch
+                if menuItems |> Seq.isEmpty then () else (gameWorldPosition, menuItems) |> ShowShortRangeScannerMenu |> dispatch
           )
           Style [
             Position PositionOptions.Relative
