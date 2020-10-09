@@ -60,7 +60,7 @@ let postGameUpdateMessage gameDispatcherMsg =
         Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg HideShortRangeScannerMenu)
         Cmd.OfAsync.result animationSleep
       ]
-    | AddTarget _ ->
+    | AddTarget _ | RemoveTarget _ ->
       Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg HideShortRangeScannerMenu)
     | _ -> Cmd.none
   | _ -> Cmd.none

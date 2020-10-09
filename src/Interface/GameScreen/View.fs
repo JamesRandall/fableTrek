@@ -4,6 +4,7 @@ open Types
 open Fable.React
 open Fable.React.Props
 open Game.Utils.GameWorld
+open Game.Rules.Weapons
 
 let transparentPopoverOverlay onClose =
   div [Class "transparentPopoverOverlay" ; OnClick (fun _ -> onClose ())] []
@@ -21,8 +22,8 @@ let root game gameDispatch model dispatch =
           Weapons.view {| player = game.Player ; gameDispatch = gameDispatch ; gameObjects = currentObjects |}
         ]
         div [Class "fireButtons"] [
-          div[] [button [Disabled model.IsUiDisabled] [str "Fire Phasers"]]
-          div[] [button [Disabled model.IsUiDisabled] [str "Fire Torpedoes"]]
+          div[] [button [Disabled (model.IsUiDisabled || not(game.Player |> canFirePhasers))] [str "Fire Phasers"]]
+          div[] [button [Disabled (model.IsUiDisabled || not(game.Player |> canFireTorpedoes))] [str "Fire Torpedoes"]]
         ]
       ]
     ]

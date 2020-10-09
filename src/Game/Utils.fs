@@ -12,8 +12,8 @@ module GameWorld =
   let positionInCurrentSector game position =
     { game.Player.Position with SectorPosition = position}
 
-  let objectAtPosition game position =
-    game |> currentSectorObjects |> Seq.tryFind(fun go -> go.Position = position)
+  let objectAtPosition gameObjects position =
+    gameObjects |> Seq.tryFind(fun go -> go.Position = position)
 
 module Position =
   let private random = System.Random(1) // always seed it with the same number while developing! Makes for a fixed predictable game.

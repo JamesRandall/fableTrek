@@ -30,7 +30,9 @@ module Menu =
         | _ -> [|"Move next to the starbase to dock" |> NoActionLabel|]
       | StarAttributes  -> [|"A star. A really big star." |> NoActionLabel|] 
     | None ->
-      if canMove player position then
+      if player.Position = position then
+        [|"USS Discovery" |> NoActionLabel|]
+      elif canMove player position then
         [|("Move to", position |> MoveTo) |> MenuItem|]
       else
         [|"Insufficient energy to move here" |> NoActionLabel |]

@@ -26,6 +26,19 @@ module Weapons =
     else
       Error (sprintf "Cannot target object at %s" gameObject.Position.AsString)
 
+  let removeTarget (player:Player) position =
+    let newPlayer = { player with Targets = player.Targets |> List.filter (fun p -> p <> position)}
+    if newPlayer.Targets.Length = player.Targets.Length then
+      Error "No target to remove"
+    else
+      Ok newPlayer
+
+  let canFirePhasers player =
+    player.Targets.Length > 0
+
+  let canFireTorpedoes player =
+    player.Targets.Length > 0 && player.Targets.Length < (player.Torpedos.Current |> int)
+
 module Movement =
   open Damage
 

@@ -19,12 +19,16 @@ let updatePlayerState msg game =
     | Ok newPlayer -> newPlayer, Cmd.none
     | Error errorMessage -> (errorMessage |> Warning |> appendToCaptainsLog playerModel), Cmd.none
   | AddTarget position ->
-    match Utils.GameWorld.objectAtPosition game position with
+    match Utils.GameWorld.objectAtPosition game.GameObjects position with
     | Some gameObject ->
       match addTarget playerModel gameObject with
       | Ok newPlayer -> newPlayer, Cmd.none
       | Error errorMessage -> (errorMessage |> Warning |> appendToCaptainsLog playerModel), Cmd.none
     | None -> playerModel, Cmd.none
+  | RemoveTarget position ->
+    match removeTarget playerModel position with
+    | Ok newPlayer -> newPlayer, Cmd.none
+    | Error errorMessage -> (errorMessage |> Warning |> appendToCaptainsLog playerModel), Cmd.none
   | _ -> playerModel, Cmd.none
 
 let update msg model =
