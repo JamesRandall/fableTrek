@@ -3,7 +3,7 @@ open Game.Types
 
 type MenuItem =
   | NoActionLabel of string
-  | MenuItem of (string * UpdatePlayerStateMsg)
+  | MenuItem of (string * UpdateGameStateMsg)
 
 type ShortRangeScannerMenu =
   { Position: GameWorldPosition ; MenuItems: MenuItem array }
@@ -25,5 +25,8 @@ type GameScreenMsg =
   | HideLongRangeScanner
   | ShowShortRangeScannerMenu of (GameWorldPosition*MenuItem array)
   | HideShortRangeScannerMenu
+  | FirePhasers
+  | ShowPhasers of GameWorldPosition
+  | HidePhasers
   | DisableUi
   | EnableUi

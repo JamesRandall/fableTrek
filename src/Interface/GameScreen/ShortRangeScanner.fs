@@ -47,7 +47,7 @@ module Menu =
         Seq.map (fun mi ->
           match mi with
           | NoActionLabel text -> label text
-          | MenuItem (text, action) -> button [OnClick (fun _ -> action |> UpdatePlayerState |> gameDispatch)] [label text]
+          | MenuItem (text, action) -> button [OnClick (fun _ -> action |> UpdateGameState |> gameDispatch)] [label text]
         )
       )
     ]

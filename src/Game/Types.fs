@@ -21,39 +21,41 @@ type stardate
 [<Measure>]
 type score
 
-//let inline zero_of (target:^t) : ^t = LanguagePrimitives.GenericZero<'t>
-
-type RangeValue<'T> when ^T : (static member (+) : ^T * ^T -> ^T )
-                     and ^T : (static member (-) : ^T * ^T -> ^T )
-                     and ^T : (static member op_Explicit : ^T -> float)
-                     and ^T : (static member Zero: ^T)
-                     and ^T : comparison =
+(*
+type RangeValue<'T> when 'T : (static member (-) : 'T * 'T -> 'T )
+                     and 'T : (static member Zero: 'T)
+                     and 'T : comparison =
   { Max: 'T
     Current: 'T
+  }
+  static member inline (-) (e:RangeValue<'T>, value: 'T) =
+    let inline sub (a:^a, b:^b) = ((^a or ^b) : (static member (-) : 'T * 'T -> 'T) (a,b))
+    let zero:'T = LanguagePrimitives.GenericZero<'T>
+    let newValue:'T = sub (e.Current,value) // (e.Current |> float) - (value |> float)
+    { e with Current = if newValue < zero then zero else newValue }
+  static member inline (-) (e:RangeValue<'T>, value: 'T) =
+    let zero:'T = LanguagePrimitives.GenericZero<'T>
+    let newValue:'T = e.Current - value
+    { e with Current = if newValue < zero then zero else newValue }
+*)
+
+type RangeValue<'T> when 'T : (static member (+) : 'T * 'T -> 'T )
+                     and 'T : (static member (-) : 'T * 'T -> 'T )
+                     and 'T : (static member op_Explicit : 'T -> float)
+                     and 'T : (static member Zero: 'T)
+                     and 'T : comparison =
+  { Max: ^T
+    Current: ^T
   }
   member inline rt.Update (newValue:^T) =
     let zero:'T = LanguagePrimitives.GenericZero<'T>
     let rangeBoundValue =      
       if newValue < zero then zero elif newValue > rt.Max then rt.Max else newValue
-    { rt with Current = rangeBoundValue }
+    { rt with Current = rangeBoundValue }  
   member inline rt.Percentage = (rt.Current |> float)/(rt.Max |> float)
   member inline rt.PercentageAsString = sprintf "%.0f" (rt.Percentage * 100.) 
   static member inline Create withMax = { Max = withMax ; Current = withMax }
-  static member inline CreateAt withValue withMax = { Max = withMax ; Current = withValue }
-  static member inline (-) (e:RangeValue<'T>, value: ^T) =
-    let zero:'T = LanguagePrimitives.GenericZero<'T>
-    let newValue = e.Current - value
-    { e with Current = if newValue < zero then zero else newValue }
-  static member inline (+) (e:RangeValue<'T>, value: ^T) =
-    let newValue = e.Current + value    
-    { e with Current = if newValue > e.Max then e.Max else newValue }
-  static member inline (+~) (e:RangeValue<'T>, value:^T)  = 
-    let newValue = e.Current + value
-    if newValue > e.Max then
-      let overflow = newValue - e.Max
-      { e with Current = e.Max }, overflow
-    else
-      { e with Current = newValue }, (newValue-newValue) // how do I get the default value / cast for a generic type, I need 0
+  static member inline CreateAt withValue withMax = { Max = withMax ; Current = withValue } 
 
 type EnergyLevel = RangeValue<float<gigawatt>>
 
@@ -204,7 +206,7 @@ type Game =
     Score = 0<score>
   }
 
-type UpdatePlayerStateMsg =
+type UpdateGameStateMsg =
   | SetPhaserPower of float<gigawatt>
   | ToggleShields
   | MoveTo of GameWorldPosition
@@ -212,7 +214,8 @@ type UpdatePlayerStateMsg =
   | RemoveTarget of GameWorldPosition
   | Dock of GameWorldPosition
   | Undock
-
+  | FirePhasersAtPosition of GameWorldPosition
+  
 type GameMsg =
   | NewGame of GameDifficulty
-  | UpdatePlayerState of UpdatePlayerStateMsg
+  | UpdateGameState of UpdateGameStateMsg

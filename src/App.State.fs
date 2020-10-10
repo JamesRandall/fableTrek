@@ -44,7 +44,7 @@ let private animationSleep = async {
 
 let preGameUpdateMessage gameDispatcherMsg =
   match gameDispatcherMsg with
-  | UpdatePlayerState subMsg ->
+  | UpdateGameState subMsg ->
     match subMsg with
     | MoveTo _ ->
       Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg DisableUi)
@@ -53,7 +53,7 @@ let preGameUpdateMessage gameDispatcherMsg =
 
 let postGameUpdateMessage gameDispatcherMsg =
   match gameDispatcherMsg with
-  | UpdatePlayerState subMsg ->
+  | UpdateGameState subMsg ->
     match subMsg with
     | MoveTo _ ->
       Cmd.batch [
@@ -65,6 +65,18 @@ let postGameUpdateMessage gameDispatcherMsg =
     | _ -> Cmd.none
   | _ -> Cmd.none
 
+let firePhasersCommandBatch player =
+  [Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg HidePhasers)]
+  |> Seq.append (
+    player.Targets
+    |> Seq.collect (fun position -> [
+        Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg (position |> ShowPhasers))
+        Cmd.map GameDispatcherMsg (Cmd.ofMsg (position |> FirePhasersAtPosition |> UpdateGameState))
+        Cmd.OfAsync.result animationSleep
+      ]
+    )
+  ) |> Cmd.batch
+
 let update msg model =
   match (msg, model) with
   | (StartScreenDispatcherMsg subMsg, { StartScreen = Some extractedModel }) ->
@@ -73,8 +85,11 @@ let update msg model =
       console.log("Dispatching new game")
       { model with CurrentGame = difficulty |> Game.Factory.createGame |> Some }, Cmd.ofMsg (GameScreenPage |> GotoPage)        
   | (GameScreenDispatcherMsg subMsg, { GameScreen = Some extractedModel ; CurrentGame = Some extractedGame }) ->
-    let (subModel, subCmd) = Interface.GameScreen.State.update subMsg extractedModel extractedGame
-    { model with GameScreen = Some subModel}, subCmd //Cmd.map GameScreenDispatcherMsg subCmd
+    match subMsg with
+    | FirePhasers -> model, extractedGame.Player |> firePhasersCommandBatch
+    | _ ->
+      let (subModel, subCmd) = Interface.GameScreen.State.update subMsg extractedModel extractedGame
+      { model with GameScreen = Some subModel}, subCmd //Cmd.map GameScreenDispatcherMsg subCmd
   | (GameDispatcherMsg subMsg, { CurrentGame = Some extractedModel }) ->
     let (subModel, subCmd) = Game.State.update subMsg extractedModel
     { model with CurrentGame = Some subModel}, Cmd.batch [

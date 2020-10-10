@@ -33,7 +33,7 @@ let targets (targets:GameWorldPosition list) gameObjects gameDispatch =
     | Some target ->
       match target.Attributes with
       | EnemyAttributes enemy ->
-        div [Class "target" ; OnClick (fun _ -> target.Position |> RemoveTarget |> UpdatePlayerState |> gameDispatch )] [
+        div [Class "target" ; OnClick (fun _ -> target.Position |> RemoveTarget |> UpdateGameState |> gameDispatch )] [
           div [Class "graphicAndCoords"] [
             label target.Position.SectorPosition.AsString
             div [Class "graphicContainer"] [div [Class "graphic"] [Units.renderGameObject target]]
@@ -66,7 +66,7 @@ let view = FunctionComponent.Of(fun (props:{| player:Player ; gameDispatch:(Game
   div [Class "weapons"] [
     div [Class "inner"] [
       label "Phaser Power"
-      rangeInput props.player.PhaserPower (fun newValue ->  float newValue * 1.<gigawatt> |> SetPhaserPower |> UpdatePlayerState |> props.gameDispatch)
+      rangeInput props.player.PhaserPower (fun newValue ->  float newValue * 1.<gigawatt> |> SetPhaserPower |> UpdateGameState |> props.gameDispatch)
       label "Phaser Temp"
       invertedLevelIndicator props.player.PhaserTemperature
       label "Phasers"

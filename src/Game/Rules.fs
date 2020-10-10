@@ -4,8 +4,27 @@ open Types
 open Utils
 
 module Enemy =
-  let energyImpact gameObject energy =
-    Some gameObject
+  let inline private overflowSubtract (current:^T) (value:^T) =
+    let zero = LanguagePrimitives.GenericZero<'T>
+    let newValue = current - value
+    if newValue < zero then
+      zero, abs newValue      
+    else
+      newValue, zero
+
+  let energyImpact gameObject energy =    
+    match gameObject.Attributes with
+    | EnemyAttributes enemy ->
+      let newShields, shieldsOverflow = overflowSubtract enemy.Shields.Current energy
+      let newHull, _ = overflowSubtract enemy.HitPoints.Current ((shieldsOverflow |> float) * 1.<hitpoints>)
+      if newHull <= 0.<hitpoints> then
+        None
+      else
+        Some { gameObject with Attributes = { enemy with Shields = enemy.Shields.Update newShields
+                                                         HitPoints = enemy.HitPoints.Update newHull
+                                            } |> EnemyAttributes
+             }      
+    | _ -> Some gameObject
 
 module Damage =
   let efficiencyFactor (systemHitPoints:HitPoints) =
@@ -45,6 +64,7 @@ module Weapons =
     player.Targets.Length > 0 && player.Targets.Length < (player.Torpedos.Current |> int)
 
   let calculatePhaserPower player =
+    // TODO: factor distance to targer in here
     (player.Phasers |> Damage.efficiencyFactor) * player.PhaserPower.Current
 
   let calculatePhaserTemperatureIncrease player =
@@ -57,15 +77,15 @@ module Weapons =
   let calculatePhaserDamage player =
     0.<hitpoints>
   
-  let firePhasers game targetPosition =
+  let inline firePhasers game targetPosition =
     let optionalTarget = Game.Utils.GameWorld.objectAtPosition game.GameObjects targetPosition
     match optionalTarget with
     | Some target ->
       let phaserEnergyHit = game.Player |> calculatePhaserPower
       let modifiedTarget = phaserEnergyHit |> Enemy.energyImpact target
-      let modifiedPlayer = { game.Player with Energy = (game.Player.Energy - game.Player.PhaserPower.Current)
-                                              PhaserTemperature = game.Player.PhaserTemperature + (game.Player |> calculatePhaserTemperatureIncrease)
-                                              Phasers = game.Player.Phasers + (game.Player |> calculatePhaserDamage)                                              
+      let modifiedPlayer = { game.Player with Energy = (game.Player.Energy.Update (game.Player.Energy.Current - game.Player.PhaserPower.Current))
+                                              PhaserTemperature = game.Player.PhaserTemperature.Update(game.Player.PhaserTemperature.Current + (game.Player |> calculatePhaserTemperatureIncrease))
+                                              Phasers = game.Player.Phasers.Update (game.Player.Phasers.Current + (game.Player |> calculatePhaserDamage))
                            }
       match modifiedTarget with
       | Some damagedTarget ->
@@ -76,7 +96,9 @@ module Weapons =
       | None -> // destroyed target
         let logMessage = (sprintf "Destroyed %s at %s" target.Name target.Position.SectorPosition.AsString)
         { game with GameObjects = Game.Utils.GameWorld.removeGameObject game.GameObjects target
-                    Player = { modifiedPlayer with CaptainsLog = [logMessage |> Information] |> List.append game.Player.CaptainsLog }
+                    Player = { modifiedPlayer with CaptainsLog = [logMessage |> Information] |> List.append game.Player.CaptainsLog
+                                                   Targets = modifiedPlayer.Targets |> List.filter (fun t -> t <> targetPosition)
+                             }
         }
     | None ->
       { game with Player = { game.Player with CaptainsLog = ["Phasers missed!" |> Warning] |> List.append game.Player.CaptainsLog }}    
@@ -100,7 +122,7 @@ module Movement =
     let energyRequirements = energyRequirementsForMove player newPosition
     match player.Energy.Current > energyRequirements, (Position.positionIsVacant gameObjects newPosition) with
     | true, true ->
-      Ok { player with Energy = player.Energy - energyRequirements ; Position = newPosition } 
+      Ok { player with Energy = player.Energy.Update (player.Energy.Current - energyRequirements) ; Position = newPosition } 
     | false, _ ->
       Error "Insufficient energy to move to that location"
     | _, false ->

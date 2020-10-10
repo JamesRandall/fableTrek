@@ -11,30 +11,32 @@ let appendToCaptainsLog player logItem =
 
 let updatePlayerState msg game =
   let playerModel = game.Player
+  let updateGameWithPlayer player = { game with Player = player }, Cmd.none
   match msg with
-  | ToggleShields -> { playerModel with ShieldsRaised = not(playerModel.ShieldsRaised)}, Cmd.none
-  | SetPhaserPower newPower -> { playerModel with PhaserPower = playerModel.PhaserPower.Update newPower }, Cmd.none
+  | ToggleShields -> { playerModel with ShieldsRaised = not(playerModel.ShieldsRaised)} |> updateGameWithPlayer
+  | SetPhaserPower newPower -> { playerModel with PhaserPower = playerModel.PhaserPower.Update newPower } |> updateGameWithPlayer
   | MoveTo newPosition ->  
     match Game.Rules.Movement.move playerModel game.GameObjects newPosition with
-    | Ok newPlayer -> newPlayer, Cmd.none
-    | Error errorMessage -> (errorMessage |> Warning |> appendToCaptainsLog playerModel), Cmd.none
+    | Ok newPlayer -> newPlayer |> updateGameWithPlayer
+    | Error errorMessage -> (errorMessage |> Warning |> appendToCaptainsLog playerModel) |> updateGameWithPlayer
   | AddTarget position ->
     match Utils.GameWorld.objectAtPosition game.GameObjects position with
     | Some gameObject ->
       match addTarget playerModel gameObject with
-      | Ok newPlayer -> newPlayer, Cmd.none
-      | Error errorMessage -> (errorMessage |> Warning |> appendToCaptainsLog playerModel), Cmd.none
-    | None -> playerModel, Cmd.none
+      | Ok newPlayer -> newPlayer |> updateGameWithPlayer
+      | Error errorMessage -> (errorMessage |> Warning |> appendToCaptainsLog playerModel) |> updateGameWithPlayer
+    | None -> playerModel |> updateGameWithPlayer
   | RemoveTarget position ->
     match removeTarget playerModel position with
-    | Ok newPlayer -> newPlayer, Cmd.none
-    | Error errorMessage -> (errorMessage |> Warning |> appendToCaptainsLog playerModel), Cmd.none
-  | _ -> playerModel, Cmd.none
+    | Ok newPlayer -> newPlayer |> updateGameWithPlayer
+    | Error errorMessage -> (errorMessage |> Warning |> appendToCaptainsLog playerModel)|> updateGameWithPlayer
+  | FirePhasersAtPosition position ->
+    firePhasers game position, Cmd.none
+  | _ -> playerModel |> updateGameWithPlayer
 
 let update msg model =
   match msg with
   | NewGame difficulty ->
     difficulty |> createGame, Cmd.none
-  | UpdatePlayerState subMsg -> 
-    let playerModel, cmd = updatePlayerState subMsg model
-    { model with Player = playerModel }, cmd
+  | UpdateGameState subMsg -> 
+    updatePlayerState subMsg model

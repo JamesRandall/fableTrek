@@ -22,7 +22,7 @@ let root game gameDispatch model dispatch =
           Weapons.view {| player = game.Player ; gameDispatch = gameDispatch ; gameObjects = currentObjects |}
         ]
         div [Class "fireButtons"] [
-          div[] [button [Disabled (model.IsUiDisabled || not(game.Player |> canFirePhasers))] [str "Fire Phasers"]]
+          div[] [button [OnClick (fun _ -> FirePhasers |> dispatch) ; Disabled (model.IsUiDisabled || not(game.Player |> canFirePhasers))] [str "Fire Phasers"]]
           div[] [button [Disabled (model.IsUiDisabled || not(game.Player |> canFireTorpedoes))] [str "Fire Torpedoes"]]
         ]
       ]
