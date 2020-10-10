@@ -15,6 +15,12 @@ module GameWorld =
   let objectAtPosition gameObjects position =
     gameObjects |> Seq.tryFind(fun go -> go.Position = position)
 
+  let replaceGameObject gameObjects newObject =
+    gameObjects |> Array.map(fun go -> if go.Position = newObject.Position then newObject else go)
+
+  let removeGameObject gameObjects toRemove =
+    gameObjects |> Array.filter(fun go -> go <> toRemove)
+
 module Position =
   let private random = System.Random(1) // always seed it with the same number while developing! Makes for a fixed predictable game.
   

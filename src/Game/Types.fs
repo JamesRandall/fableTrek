@@ -41,7 +41,12 @@ type RangeValue<'T> when ^T : (static member (+) : ^T * ^T -> ^T )
   static member inline Create withMax = { Max = withMax ; Current = withMax }
   static member inline CreateAt withValue withMax = { Max = withMax ; Current = withValue }
   static member inline (-) (e:RangeValue<'T>, value: ^T) =
-    { e with Current = e.Current - value }
+    let zero:'T = LanguagePrimitives.GenericZero<'T>
+    let newValue = e.Current - value
+    { e with Current = if newValue < zero then zero else newValue }
+  static member inline (+) (e:RangeValue<'T>, value: ^T) =
+    let newValue = e.Current + value    
+    { e with Current = if newValue > e.Max then e.Max else newValue }
   static member inline (+~) (e:RangeValue<'T>, value:^T)  = 
     let newValue = e.Current + value
     if newValue > e.Max then
@@ -128,6 +133,7 @@ type Player =
     TorpedoLaunchers: HitPoints
     // Energy costs
     ImpulseMovementCost: float<gigawatt>
+    PhaserTemperatureCostPerGigawatt: float<celcius>
   }
   static member Default =
     {
@@ -155,6 +161,7 @@ type Player =
       TorpedoLaunchers = HitPoints.Create 1000.<hitpoints>
       // Energy costs
       ImpulseMovementCost = 50.<gigawatt>
+      PhaserTemperatureCostPerGigawatt = 1.5<celcius>
     }
 
 type GameObjectAttributes =
