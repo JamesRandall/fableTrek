@@ -13,11 +13,13 @@ type Model =
     IsUiDisabled: bool
     IsLongRangeScannerVisible: bool
     ShortRangeScannerMenuItems: ShortRangeScannerMenu option
+    FiringTargets: GameWorldPosition list
   }
   static member Empty =
     { IsUiDisabled = false
       IsLongRangeScannerVisible = false
       ShortRangeScannerMenuItems = None
+      FiringTargets = List.empty
     }
 
 type GameScreenMsg =
@@ -26,6 +28,8 @@ type GameScreenMsg =
   | ShowShortRangeScannerMenu of (GameWorldPosition*MenuItem array)
   | HideShortRangeScannerMenu
   | FirePhasers
+  | FirePhasersAtNextTarget
+  | FirePhasersAtTarget of GameWorldPosition
   | ShowPhasers of GameWorldPosition
   | HidePhasers
   | DisableUi

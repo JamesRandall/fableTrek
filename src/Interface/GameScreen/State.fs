@@ -1,6 +1,8 @@
 module Interface.GameScreen.State
 open Types
 open Elmish
+open Game.Types
+
 
 let init () = Model.Empty, Cmd.none
 
@@ -14,5 +16,12 @@ let update msg (model:Model) game =
     { model with IsUiDisabled = true }, Cmd.none
   | EnableUi ->
     { model with IsUiDisabled = false }, Cmd.none
+  | FirePhasers ->
+    { model with FiringTargets = game.Player.Targets }, Cmd.ofMsg FirePhasersAtNextTarget
+  | FirePhasersAtNextTarget ->
+    match model.FiringTargets |> Seq.tryHead with
+    | Some nextTarget ->
+      { model with FiringTargets = model.FiringTargets |> Seq.skip 1 |> Seq.toList }, Cmd.ofMsg (nextTarget |> FirePhasersAtTarget)
+    | None -> model, Cmd.none
   | _ ->
     model, Cmd.none

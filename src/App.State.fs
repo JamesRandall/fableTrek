@@ -37,9 +37,14 @@ let init result =
 open Game.Types
 open Interface.GameScreen.Types
 
-let private animationSleep = async {
+let private animationSleep () = async {
   do! Async.Sleep (Interface.Animation.scannerAnimationDurationMs)
   return EnableUi |> GameScreenDispatcherMsg
+}
+
+let private sleepThenFireNextPhasers = async {
+  do! Async.Sleep (Interface.Animation.phaserAnimationDurationMs)
+  return FirePhasersAtNextTarget |> GameScreenDispatcherMsg
 }
 
 let preGameUpdateMessage gameDispatcherMsg =
@@ -58,24 +63,13 @@ let postGameUpdateMessage gameDispatcherMsg =
     | MoveTo _ ->
       Cmd.batch [
         Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg HideShortRangeScannerMenu)
-        Cmd.OfAsync.result animationSleep
+        Cmd.OfAsync.result (animationSleep ())
       ]
     | AddTarget _ | RemoveTarget _ ->
       Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg HideShortRangeScannerMenu)
-    | _ -> Cmd.none
+    | FirePhasersAtPosition _ -> Cmd.OfAsync.result sleepThenFireNextPhasers      
+    | _ -> Cmd.none      
   | _ -> Cmd.none
-
-let firePhasersCommandBatch player =
-  [Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg HidePhasers)]
-  |> Seq.append (
-    player.Targets
-    |> Seq.collect (fun position -> [
-        Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg (position |> ShowPhasers))
-        Cmd.map GameDispatcherMsg (Cmd.ofMsg (position |> FirePhasersAtPosition |> UpdateGameState))
-        Cmd.OfAsync.result animationSleep
-      ]
-    )
-  ) |> Cmd.batch
 
 let update msg model =
   match (msg, model) with
@@ -86,10 +80,12 @@ let update msg model =
       { model with CurrentGame = difficulty |> Game.Factory.createGame |> Some }, Cmd.ofMsg (GameScreenPage |> GotoPage)        
   | (GameScreenDispatcherMsg subMsg, { GameScreen = Some extractedModel ; CurrentGame = Some extractedGame }) ->
     match subMsg with
-    | FirePhasers -> model, extractedGame.Player |> firePhasersCommandBatch
+    | FirePhasersAtTarget position ->
+      let (subModel, subCmd) = Interface.GameScreen.State.update subMsg extractedModel extractedGame
+      model, Cmd.map GameDispatcherMsg (Cmd.ofMsg (position |> FirePhasersAtPosition |> UpdateGameState))
     | _ ->
       let (subModel, subCmd) = Interface.GameScreen.State.update subMsg extractedModel extractedGame
-      { model with GameScreen = Some subModel}, subCmd //Cmd.map GameScreenDispatcherMsg subCmd
+      { model with GameScreen = Some subModel}, Cmd.map GameScreenDispatcherMsg subCmd
   | (GameDispatcherMsg subMsg, { CurrentGame = Some extractedModel }) ->
     let (subModel, subCmd) = Game.State.update subMsg extractedModel
     { model with CurrentGame = Some subModel}, Cmd.batch [
@@ -100,6 +96,11 @@ let update msg model =
   | GotoPage page,_ ->
     page |> Router.modifyLocation
     model, Cmd.none
+  | CommandSequence sequence,_ ->
+    match sequence |> Seq.tryHead with
+    | Some head ->
+      model, Cmd.batch [head ; Cmd.ofMsg (sequence |> Seq.skip 1 |> Seq.toArray |> CommandSequence)]
+    | None -> model, Cmd.none
   | _ ->
     console.error("Missing match in App.State")
     model, Cmd.none

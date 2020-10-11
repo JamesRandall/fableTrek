@@ -1,6 +1,7 @@
 module App.Types
 open Router
 open Game.Types
+open Elmish
 
 type Model =
   {
@@ -22,3 +23,4 @@ type Msg =
   | GameDispatcherMsg of GameMsg
   | GameScreenDispatcherMsg of Interface.GameScreen.Types.GameScreenMsg
   | StartScreenDispatcherMsg of Interface.StartScreen.Types.StartScreenMsg
+  | CommandSequence of Cmd<Msg> array
