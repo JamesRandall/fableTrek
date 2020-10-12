@@ -52,7 +52,7 @@ module Menu =
       )
     ]
 
-let view isUiDisabled (gameObjects:GameObject array) (player:Player) (menuItems:ShortRangeScannerMenu option) dispatch gameDispatch =
+let view isUiDisabled (gameObjects:GameObject array) (player:Player) (menuItems:ShortRangeScannerMenu option) phaserTarget dispatch gameDispatch =
   //let containerSize = Hooks.useState (0,0)
   // let containerRef = Hooks.useRef None
 
@@ -124,6 +124,19 @@ let view isUiDisabled (gameObjects:GameObject array) (player:Player) (menuItems:
       )
     )
 
+  let phasersOverlay =
+    let fromX = (((player.Position.SectorPosition.X |> float) * gridWidthPercentage ) + gridWidthPercentage/2.) * 100.
+    let fromY = (((player.Position.SectorPosition.Y |> float) * gridHeightPercentage ) + gridHeightPercentage/2.) * 100.
+    let toX = ((3. * gridWidthPercentage ) + gridWidthPercentage/2.) * 100.
+    let toY = ((2. * gridHeightPercentage ) + gridHeightPercentage/2.) * 100.
+    let linePath = sprintf "M %f %f L %f %f" fromX fromY toX toY
+    div [Class "phaserOverlay"] [
+      svg [Style [Width "100%" ; Height "100%"] ; ViewBox "0 0 100 100"] [
+        path [D linePath ; SVGAttr.Stroke "red" ; SVGAttr.StrokeWidth 1.] []
+        path [D "M 0 0 100 100" ; SVGAttr.Stroke "red" ; SVGAttr.StrokeWidth 1.] []
+      ]
+    ]
+
   let verticalLines =
     { 0..(numberOfColumns-2) }
     |> Seq.map(fun g ->
@@ -139,6 +152,7 @@ let view isUiDisabled (gameObjects:GameObject array) (player:Player) (menuItems:
 
   div [Class "shortRangeScanner"] (
     [overlayGrid]
+    //|> Seq.append [phasersOverlay]
     |> Seq.append renderedSectorObjects 
     |> Seq.append verticalLines
     |> Seq.append horizontalLines    

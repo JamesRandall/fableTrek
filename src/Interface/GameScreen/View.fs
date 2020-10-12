@@ -15,7 +15,7 @@ let root game gameDispatch model dispatch =
     match model.ShortRangeScannerMenuItems with | Some _ -> transparentPopoverOverlay (fun () -> HideShortRangeScannerMenu |> dispatch) | None -> fragment [] []
     div [Class "outerContainer"] [
       div [Class "innerContainer"] [
-        ShortRangeScanner.view model.IsUiDisabled currentObjects game.Player model.ShortRangeScannerMenuItems dispatch gameDispatch
+        ShortRangeScanner.view model.IsUiDisabled currentObjects game.Player model.ShortRangeScannerMenuItems (model.FiringTargets |> Seq.tryHead) dispatch gameDispatch
         div [Class "bottomBar"] []
         div [Class "sideBar"] [
           EnergyManagement.view {| player = game.Player |}
