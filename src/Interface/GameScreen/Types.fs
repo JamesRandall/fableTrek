@@ -14,12 +14,14 @@ type Model =
     IsLongRangeScannerVisible: bool
     ShortRangeScannerMenuItems: ShortRangeScannerMenu option
     FiringTargets: GameWorldPosition list
+    CurrentTarget: GameWorldPosition option
   }
   static member Empty =
     { IsUiDisabled = false
       IsLongRangeScannerVisible = false
       ShortRangeScannerMenuItems = None
       FiringTargets = List.empty
+      CurrentTarget = None
     }
 
 type GameScreenMsg =

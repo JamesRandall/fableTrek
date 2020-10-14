@@ -52,10 +52,37 @@ module Menu =
       )
     ]
 
-let view isUiDisabled (gameObjects:GameObject array) (player:Player) (menuItems:ShortRangeScannerMenu option) phaserTarget dispatch gameDispatch =
-  //let containerSize = Hooks.useState (0,0)
-  // let containerRef = Hooks.useRef None
+let phaserOverlay = FunctionComponent.Of(fun (props:{| player:Player ; gridWidthPercentage:float ; gridHeightPercentage:float ; optionalTarget: Game.Types.GameWorldPosition option |}) ->
+  let player = props.player
+  let gridWidthPercentage = props.gridWidthPercentage
+  let gridHeightPercentage = props.gridHeightPercentage
 
+  let size = Hooks.useState(0,0)
+  let cachedTarget = Hooks.useState({X = -1<coordinatecomponent> ; Y = -1<coordinatecomponent>})
+  let opacity,currentTarget =
+    match props.optionalTarget with
+    | Some target ->      
+      1., if (cachedTarget.current <> target.SectorPosition) then cachedTarget.update(target.SectorPosition) ; target.SectorPosition else target.SectorPosition
+    | None -> 0.,cachedTarget.current
+  
+  let container = Hooks.useRef None
+  Interface.Browser.Helpers.debouncedSize container size.update
+  
+  let fromX = (((player.Position.SectorPosition.X |> float) * gridWidthPercentage ) + gridWidthPercentage/2.) * (size.current |> fst |> float)
+  let fromY = (((player.Position.SectorPosition.Y |> float) * gridHeightPercentage ) + gridHeightPercentage/2.) * (size.current |> snd |> float)
+  let toX = (((currentTarget.X |> float) * gridWidthPercentage ) + gridWidthPercentage/2.) * (size.current |> fst |> float)
+  let toY = (((currentTarget.Y |> float) * gridHeightPercentage ) + gridHeightPercentage/2.) * (size.current |> snd |> float)
+  let linePath = sprintf "M %f %f L %f %f" fromX fromY toX toY
+  div [Class "phaserOverlay"; RefHook container ; Style [Opacity opacity]] [
+    svg [
+      Style [Width (sprintf "%dpx" (size.current |> fst)) ; Height (sprintf "%dpx" (size.current |> snd))]
+      ViewBox (sprintf "0 0 %d %d" (size.current |> fst) (size.current |> snd))] [
+      path [D linePath ; SVGAttr.Stroke "orange" ; SVGAttr.StrokeWidth 3.] []      
+    ]
+  ]
+)
+
+let view isUiDisabled (gameObjects:GameObject array) (player:Player) (menuItems:ShortRangeScannerMenu option) optionalPhaserTarget dispatch gameDispatch =
   let gridWidthPercentage = 1. / ((GameWorldPosition.Max.SectorPosition.Y+1<coordinatecomponent>) |> float)
   let gridWidthPercentageAsString = sprintf "%f%%" (gridWidthPercentage * 100.)
   let gridHeightPercentage = 1. / ((GameWorldPosition.Max.SectorPosition.X+1<coordinatecomponent>) |> float)
@@ -124,19 +151,6 @@ let view isUiDisabled (gameObjects:GameObject array) (player:Player) (menuItems:
       )
     )
 
-  let phasersOverlay =
-    let fromX = (((player.Position.SectorPosition.X |> float) * gridWidthPercentage ) + gridWidthPercentage/2.) * 100.
-    let fromY = (((player.Position.SectorPosition.Y |> float) * gridHeightPercentage ) + gridHeightPercentage/2.) * 100.
-    let toX = ((3. * gridWidthPercentage ) + gridWidthPercentage/2.) * 100.
-    let toY = ((2. * gridHeightPercentage ) + gridHeightPercentage/2.) * 100.
-    let linePath = sprintf "M %f %f L %f %f" fromX fromY toX toY
-    div [Class "phaserOverlay"] [
-      svg [Style [Width "100%" ; Height "100%"] ; ViewBox "0 0 100 100"] [
-        path [D linePath ; SVGAttr.Stroke "red" ; SVGAttr.StrokeWidth 1.] []
-        path [D "M 0 0 100 100" ; SVGAttr.Stroke "red" ; SVGAttr.StrokeWidth 1.] []
-      ]
-    ]
-
   let verticalLines =
     { 0..(numberOfColumns-2) }
     |> Seq.map(fun g ->
@@ -149,10 +163,13 @@ let view isUiDisabled (gameObjects:GameObject array) (player:Player) (menuItems:
       let topPercentage = sprintf "%f%%" ((g |> float) / ((GameWorldPosition.Max.SectorPosition.Y+1<coordinatecomponent>) |> float) * 100.)
       div [Class "horizontalLine" ; Style [CSSProp.Top topPercentage ; cssHeight]] []
     )    
+  
+  let phasers =
+    phaserOverlay({| player=player ; gridWidthPercentage=gridWidthPercentage ; gridHeightPercentage=gridHeightPercentage ; optionalTarget = optionalPhaserTarget |})    
 
   div [Class "shortRangeScanner"] (
     [overlayGrid]
-    //|> Seq.append [phasersOverlay]
+    |> Seq.append [phasers]
     |> Seq.append renderedSectorObjects 
     |> Seq.append verticalLines
     |> Seq.append horizontalLines    

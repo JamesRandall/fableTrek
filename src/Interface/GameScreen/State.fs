@@ -21,7 +21,7 @@ let update msg (model:Model) game =
   | FirePhasersAtNextTarget ->
     match model.FiringTargets |> Seq.tryHead with
     | Some nextTarget ->
-      { model with FiringTargets = model.FiringTargets |> Seq.skip 1 |> Seq.toList }, Cmd.ofMsg (nextTarget |> FirePhasersAtTarget)
-    | None -> model, Cmd.none
+      { model with CurrentTarget = Some nextTarget ; FiringTargets = model.FiringTargets |> Seq.skip 1 |> Seq.toList }, Cmd.ofMsg (nextTarget |> FirePhasersAtTarget)
+    | None -> { model with CurrentTarget = None }, Cmd.none
   | _ ->
     model, Cmd.none
