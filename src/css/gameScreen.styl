@@ -6,6 +6,22 @@
   background-repeat no-repeat
   background-position: right center
 
+  .explodingScout
+    rect
+      transition all 750ms ease-in
+
+  .unitStrip
+    background-color: black
+    padding: 10px
+    display: flex
+    flex-direction: row
+    justify-content: flex-start
+    align-items: center
+    div
+      width: 32px
+      height: 32px
+      margin-right: 16px
+
   .transparentPopoverOverlay
     position absolute
     z-index: $overlayZIndex

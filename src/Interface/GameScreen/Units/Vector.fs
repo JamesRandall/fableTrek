@@ -1,55 +1,53 @@
-module Interface.GameScreen.Units
+module Interface.GameScreen.Units.Vector
 
 open Fable.React
 open Fable.React.Props
-
 open Game.Types
+open Common
 
 module Renderers =
   open Interface.Common.Css
   let private strokeWidth = 3.0
   let private bgOpacity = 0.1
 
-  let private unitSvg inner =
-    svg [Style [Width "100%" ; Height "100%"] ; ViewBox "0 0 100 100" ; SVGAttr.PreserveAspectRatio "xMinYMid keep"] [
-      g [SVGAttr.Transform "translate(5,5) scale(0.9,0.9)"] inner
-    ]
+  
   
   let star =
     unitSvg [
       circle [Cx 50 ; Cy 50 ; R 50 ; SVGAttr.Fill (rgba 252 186 3 bgOpacity) ; SVGAttr.StrokeWidth strokeWidth ; SVGAttr.Stroke "rgb(252,186,3)"] []
     ]
 
-  let opaquePlayer opacity =
+  let opaquePlayer shouldFill opacity =
     unitSvg [
       path [
         SVGAttr.StrokeWidth strokeWidth
-        SVGAttr.Fill (rgba 0 255 255 bgOpacity)
+        SVGAttr.Fill (rgba 0 255 255 (if shouldFill then bgOpacity else 0.0))
         SVGAttr.Stroke (rgba 0 255 255 opacity)
         D "M 50 0 L 25 58 L 0 50 L 25 100 L 50 83 L 75 100 L 100 50 L 75 58 L 50 0"] []
     ]
 
-  let player = opaquePlayer 1.0
-
-  let enemyScout =
+  let player shouldFill = opaquePlayer shouldFill 1.0
+  
+  let enemyScout shouldFill =    
     unitSvg [
       path [
         SVGAttr.StrokeWidth strokeWidth
-        SVGAttr.Fill (rgba 255 0 0 bgOpacity)
+        SVGAttr.Fill (rgba 255 0 0 (if shouldFill then bgOpacity else 0.0))
         SVGAttr.Stroke (rgb 255 0 0)
         D "M 50 0 L 10 100 L 50 70 L 90 100 L 50 0"] []
     ]
+    //Pixelated.Scout.pixelatedScout ({| dispatch = (fun _ -> ()) |})
 
-  let enemyCruiser =
+  let enemyCruiser shouldFill =
     unitSvg [
       path [
         SVGAttr.StrokeWidth strokeWidth
-        SVGAttr.Fill (rgba 255 0 0 bgOpacity)
+        SVGAttr.Fill (rgba 255 0 0 (if shouldFill then bgOpacity else 0.0))
         SVGAttr.Stroke (rgb 255 0 0)
         D "M 50 0 L 0 90 L 40 100 L 60 100 L 100 90 L 50 0"] []
     ]
     
-  let enemyDreadnought =
+  let enemyDreadnought shouldFill =
     unitSvg [
       rect [
         SVGAttr.X 0
@@ -57,7 +55,7 @@ module Renderers =
         SVGAttr.Width 100
         SVGAttr.Height 100
         SVGAttr.StrokeWidth strokeWidth
-        SVGAttr.Fill (rgba 255 0 0 bgOpacity)
+        SVGAttr.Fill (rgba 255 0 0 (if shouldFill then bgOpacity else 0.0))
         SVGAttr.Stroke (rgb 255 0 0)
       ] []
       rect [
@@ -88,10 +86,18 @@ let renderGameObject go =
     star
   | EnemyAttributes enemy ->
     match enemy.ShipClass with
-    | Scout _ -> enemyScout
-    | Cruiser _ -> enemyCruiser
-    | Dreadnought _ -> enemyDreadnought
+    | Scout _ -> enemyScout true
+    | Cruiser _ -> enemyCruiser true
+    | Dreadnought _ -> enemyDreadnought true
   | _ -> fragment [] []
 
+let renderUnitStrip =
+  div [Class "unitStrip"] [
+    div [] [enemyScout false]
+    div [] [enemyCruiser false]
+    div [] [enemyDreadnought false]
+    div [] [player false]
+  ]
+
 let renderPlayer () =
-  player
+  player true

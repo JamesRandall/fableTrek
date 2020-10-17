@@ -8,6 +8,9 @@ type MenuItem =
 type ShortRangeScannerMenu =
   { Position: GameWorldPosition ; MenuItems: MenuItem array }
 
+type Explosion =
+  | ExplodingEnemyScout of GameWorldPosition  
+
 type Model =
   {
     IsUiDisabled: bool
@@ -15,6 +18,7 @@ type Model =
     ShortRangeScannerMenuItems: ShortRangeScannerMenu option
     FiringTargets: GameWorldPosition list
     CurrentTarget: GameWorldPosition option
+    Explosions: Explosion list
   }
   static member Empty =
     { IsUiDisabled = false
@@ -22,6 +26,7 @@ type Model =
       ShortRangeScannerMenuItems = None
       FiringTargets = List.empty
       CurrentTarget = None
+      Explosions = List.empty
     }
 
 type GameScreenMsg =
@@ -33,6 +38,7 @@ type GameScreenMsg =
   | FirePhasersAtNextTarget
   | FirePhasersAtTarget of GameWorldPosition
   | ShowPhasers of GameWorldPosition
+  | ShowExplosion of Explosion
   | HidePhasers
   | DisableUi
   | EnableUi

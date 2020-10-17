@@ -31,7 +31,14 @@ let updatePlayerState msg game =
     | Ok newPlayer -> newPlayer |> updateGameWithPlayer
     | Error errorMessage -> (errorMessage |> Warning |> appendToCaptainsLog playerModel)|> updateGameWithPlayer
   | FirePhasersAtPosition position ->
-    firePhasers game position, Cmd.none
+    match firePhasers game position with
+    | FiringResponse.TargetDestroyed updatedGame ->
+      updatedGame, Cmd.ofMsg (position |> UpdateGameStateMsg.TargetDestroyed |> UpdateGameState)
+    | FiringResponse.TargetDamaged updatedGame ->
+      updatedGame, Cmd.none
+    | FiringResponse.TargetMissed updatedGame ->
+      updatedGame, Cmd.none
+
   | _ -> playerModel |> updateGameWithPlayer
 
 let update msg model =

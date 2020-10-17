@@ -17,7 +17,10 @@
     <Compile Include="Interface/StartScreen/View.fs" />
     <Compile Include="Interface/GameScreen/Types.fs" />
     <Compile Include="Interface/GameScreen/State.fs" />
-    <Compile Include="Interface/GameScreen/Units.fs" />
+    <Compile Include="Interface/GameScreen/Units/Common.fs" />
+    <Compile Include="Interface/GameScreen/Units/PixelatedPlayer.fs" />
+    <Compile Include="Interface/GameScreen/Units/PixelatedScout.fs" />
+    <Compile Include="Interface/GameScreen/Units/Vector.fs" />
     <Compile Include="Interface/GameScreen/ShortRangeScanner.fs" />
     <Compile Include="Interface/GameScreen/EnergyManagement.fs" />
     <Compile Include="Interface/GameScreen/Weapons.fs" />

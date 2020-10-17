@@ -67,7 +67,7 @@ let view = FunctionComponent.Of(fun (props:{| player:Player |}) ->
         div [Class "shieldsContainer" ; RefHook shieldContainerRef] [
           div [Class "shieldPlayerContainer"] [
             div [Class "shieldsPlayer"] [
-              Units.Renderers.opaquePlayer 1.0
+              Units.Vector.Renderers.opaquePlayer true 1.0
             ]
           ]
           div [Class "shieldsGraphics" ; Style [Width (shieldContainerSize.current |> fst) ; Height (shieldContainerSize.current |> fst)]] [

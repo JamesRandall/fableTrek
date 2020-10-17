@@ -92,16 +92,16 @@ module Weapons =
         let logMessage = (sprintf "Hit of %.0f gigawatts on %s at %s" phaserEnergyHit target.Name target.Position.SectorPosition.AsString)
         { game with GameObjects = Game.Utils.GameWorld.replaceGameObject game.GameObjects damagedTarget
                     Player = { modifiedPlayer with CaptainsLog = [logMessage |> Information] |> List.append game.Player.CaptainsLog }
-        }
+        } |> FiringResponse.TargetDamaged
       | None -> // destroyed target
         let logMessage = (sprintf "Destroyed %s at %s" target.Name target.Position.SectorPosition.AsString)
         { game with GameObjects = Game.Utils.GameWorld.removeGameObject game.GameObjects target
                     Player = { modifiedPlayer with CaptainsLog = [logMessage |> Information] |> List.append game.Player.CaptainsLog
                                                    Targets = modifiedPlayer.Targets |> List.filter (fun t -> t <> targetPosition)
                              }
-        }
+        } |> FiringResponse.TargetDestroyed
     | None ->
-      { game with Player = { game.Player with CaptainsLog = ["Phasers missed!" |> Warning] |> List.append game.Player.CaptainsLog }}    
+      { game with Player = { game.Player with CaptainsLog = ["Phasers missed!" |> Warning] |> List.append game.Player.CaptainsLog }} |> FiringResponse.TargetMissed
 
 module Movement =
   open Damage

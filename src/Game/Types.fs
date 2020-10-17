@@ -206,6 +206,11 @@ type Game =
     Score = 0<score>
   }
 
+type FiringResponse =
+  | TargetDamaged of Game
+  | TargetDestroyed of Game
+  | TargetMissed of Game
+
 type UpdateGameStateMsg =
   | SetPhaserPower of float<gigawatt>
   | ToggleShields
@@ -215,6 +220,7 @@ type UpdateGameStateMsg =
   | Dock of GameWorldPosition
   | Undock
   | FirePhasersAtPosition of GameWorldPosition
+  | TargetDestroyed of GameWorldPosition
   
 type GameMsg =
   | NewGame of GameDifficulty

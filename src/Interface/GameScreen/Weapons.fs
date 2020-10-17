@@ -36,7 +36,7 @@ let targets (targets:GameWorldPosition list) gameObjects gameDispatch =
         div [Class "target" ; OnClick (fun _ -> target.Position |> RemoveTarget |> UpdateGameState |> gameDispatch )] [
           div [Class "graphicAndCoords"] [
             label target.Position.SectorPosition.AsString
-            div [Class "graphicContainer"] [div [Class "graphic"] [Units.renderGameObject target]]
+            div [Class "graphicContainer"] [div [Class "graphic"] [Units.Vector.renderGameObject target]]
           ]          
           div [Class "summary"] [
             label "E"

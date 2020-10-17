@@ -6,7 +6,7 @@ open Game.Types
 open Game.Utils.Position
 open Game.Rules.Movement
 open Game.Rules.Weapons
-open Units
+open Units.Vector
 open Types
 open Interface.Common
 
@@ -82,7 +82,7 @@ let phaserOverlay = FunctionComponent.Of(fun (props:{| player:Player ; gridWidth
   ]
 )
 
-let view isUiDisabled (gameObjects:GameObject array) (player:Player) (menuItems:ShortRangeScannerMenu option) optionalPhaserTarget dispatch gameDispatch =
+let view isUiDisabled (explosions:Explosion list) (gameObjects:GameObject array) (player:Player) (menuItems:ShortRangeScannerMenu option) optionalPhaserTarget dispatch gameDispatch =
   let gridWidthPercentage = 1. / ((GameWorldPosition.Max.SectorPosition.Y+1<coordinatecomponent>) |> float)
   let gridWidthPercentageAsString = sprintf "%f%%" (gridWidthPercentage * 100.)
   let gridHeightPercentage = 1. / ((GameWorldPosition.Max.SectorPosition.X+1<coordinatecomponent>) |> float)
@@ -94,24 +94,40 @@ let view isUiDisabled (gameObjects:GameObject array) (player:Player) (menuItems:
   let cssWidth = CSSProp.Width gridWidthPercentageAsString
   let cssHeight = CSSProp.Height gridHeightPercentageAsString
 
-  let renderedSectorObjects =
-    gameObjects
-    |> Seq.map (fun go ->
-      div [Class "gameObject" ; Style [getLeft go.Position.SectorPosition.X ; getTop go.Position.SectorPosition.Y ; cssWidth ; cssHeight ]] [
-        div [Style [Height "80%" ; Width "80%"]] [go |> renderGameObject]
-      ]
+  let renderedSectorObjects = 
+    [
+      div [Class "gameObjects"] (
+        gameObjects
+        |> Seq.map (fun go ->
+          div [Class "gameObject" ; Style [getLeft go.Position.SectorPosition.X ; getTop go.Position.SectorPosition.Y ; cssWidth ; cssHeight ]] [
+            div [Style [Height "80%" ; Width "80%"]] [go |> renderGameObject]
+          ]
+        )
+        |> Seq.append [
+          div [Class "gameObject" ; Style [
+            Transition (sprintf "left %s, top %s" Interface.Animation.scannerAnimationDurationCss Interface.Animation.scannerAnimationDurationCss) 
+            getLeft player.Position.SectorPosition.X
+            getTop player.Position.SectorPosition.Y
+            cssWidth
+            cssHeight ]
+            ] [
+            div [Style [Height "80%" ; Width "80%"]] [renderPlayer ()]
+          ]
+        ]
+      )
+    ]    
+
+  let renderedExplosions =
+    explosions
+    |> Seq.map (fun explosion ->
+      match explosion with
+      | ExplodingEnemyScout position ->
+        div [Class "explosion" ; Style [getLeft position.SectorPosition.X ; getTop position.SectorPosition.Y ; cssWidth ; cssHeight ]] [
+          div [Style [Height "80%" ; Width "80%"]] [Units.Pixelated.Scout.pixelatedScout ({| dispatch = (fun _ -> ()) |})]
+        ]
     )
-    |> Seq.append [
-      div [Class "gameObject" ; Style [
-        Transition (sprintf "left %s, top %s" Interface.Animation.scannerAnimationDurationCss Interface.Animation.scannerAnimationDurationCss) 
-        getLeft player.Position.SectorPosition.X
-        getTop player.Position.SectorPosition.Y
-        cssWidth
-        cssHeight ]
-        ] [
-        div [Style [Height "80%" ; Width "80%"]] [renderPlayer ()]
-      ]
-    ]
+
+  
   
   let overlayGrid =
     let gridTemplateRows = (Seq.replicate numberOfRows (sprintf "%s " gridHeightPercentageAsString)) |> Seq.toArray |> Array.fold (+) ""
@@ -171,6 +187,7 @@ let view isUiDisabled (gameObjects:GameObject array) (player:Player) (menuItems:
     [overlayGrid]
     |> Seq.append [phasers]
     |> Seq.append renderedSectorObjects 
+    |> Seq.append renderedExplosions
     |> Seq.append verticalLines
     |> Seq.append horizontalLines    
   )

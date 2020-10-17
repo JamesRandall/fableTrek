@@ -68,6 +68,7 @@ let postGameUpdateMessage gameDispatcherMsg =
     | AddTarget _ | RemoveTarget _ ->
       Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg HideShortRangeScannerMenu)
     | FirePhasersAtPosition _ -> Cmd.OfAsync.result sleepThenFireNextPhasers      
+    | TargetDestroyed position -> Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg (position |> Explosion.ExplodingEnemyScout |> ShowExplosion))
     | _ -> Cmd.none      
   | _ -> Cmd.none
 

@@ -16,6 +16,8 @@ let update msg (model:Model) game =
     { model with IsUiDisabled = true }, Cmd.none
   | EnableUi ->
     { model with IsUiDisabled = false }, Cmd.none
+  | ShowExplosion explosion ->
+    { model with Explosions = model.Explosions |> List.append [explosion]}, Cmd.none
   | FirePhasers ->
     { model with FiringTargets = game.Player.Targets }, Cmd.ofMsg FirePhasersAtNextTarget
   | FirePhasersAtNextTarget ->

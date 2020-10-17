@@ -12,10 +12,11 @@ let transparentPopoverOverlay onClose =
 let root game gameDispatch model dispatch =
   let currentObjects = game |> currentSectorObjects |> Seq.toArray
   div [Class "gameScreen"] [
+    // Units.Vector.renderUnitStrip
     match model.ShortRangeScannerMenuItems with | Some _ -> transparentPopoverOverlay (fun () -> HideShortRangeScannerMenu |> dispatch) | None -> fragment [] []
     div [Class "outerContainer"] [
       div [Class "innerContainer"] [
-        ShortRangeScanner.view model.IsUiDisabled currentObjects game.Player model.ShortRangeScannerMenuItems (model.CurrentTarget) dispatch gameDispatch
+        ShortRangeScanner.view model.IsUiDisabled model.Explosions currentObjects game.Player model.ShortRangeScannerMenuItems (model.CurrentTarget) dispatch gameDispatch
         div [Class "bottomBar"] [
           div [Class "scoreAndStartdate"] [
             button [] [
