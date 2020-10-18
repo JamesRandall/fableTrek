@@ -6,6 +6,7 @@ open Interface.Common
 open Game.Types
 open Types
 open Game.Rules.Movement
+open Interface.Browser.Helpers
 
 type SectorSummary =
   { Position: Position
@@ -27,7 +28,26 @@ let calculateSummaries (gameObjects:GameObject seq) (player:Player) =
     }
   )
 
-let view warpDestinationOption discoveredSectors gameObjects (player:Player) dispatch gameDispatch =  
+let view = FunctionComponent.Of(fun (props:{| WarpDestinationOption: Position option
+                                              DiscoveredSectors: Position seq
+                                              GameObjects: GameObject seq
+                                              Player: Player
+                                              IsWarping: bool
+                                              Dispatch: GameScreenMsg -> unit
+                                              GameDispatch: GameMsg -> unit
+                                           |}) ->
+  let size = Hooks.useState(-1,-1)
+  let starfieldContainerRef = Hooks.useRef None
+
+  debouncedSize starfieldContainerRef size.update
+
+  let warpDestinationOption = props.WarpDestinationOption
+  let discoveredSectors = props.DiscoveredSectors
+  let gameObjects = props.GameObjects
+  let player = props.Player
+  let dispatch = props.Dispatch
+  let gameDispatch = props.GameDispatch
+
   let intLabel (colorClass,intValue) =
     div [Class (sprintf "label %s" colorClass)] [str (sprintf "%d" intValue)]
   let textLabel (colorClass,strValue) =
@@ -37,10 +57,22 @@ let view warpDestinationOption discoveredSectors gameObjects (player:Player) dis
     match warpDestinationOption with
     | Some warpDestination -> canMove player { player.Position with GalacticPosition = warpDestination }
     | None -> false
+
+  let beginWarpClick =
+    match warpDestinationOption with
+    | Some warpDestination -> (fun _ -> warpDestination |> BeginWarpTo |> dispatch)
+    | None -> ignore
+
   let summaries = calculateSummaries gameObjects player
   let templateColumns = "1fr " |> Seq.replicate (GameWorldPosition.Max.GalacticPosition.X + 1<coordinatecomponent> |> int) |> System.String.Concat
   div [Class "longRangeScanner"] [
-    div [Class "scannerOuter"] [
+    div [Class "scannerOuter" ; RefHook starfieldContainerRef] [
+      if props.IsWarping then
+        div [Class "starfield"] [
+          if (size.current |> fst) > -1 then StarField.view ({| Width = size.current |> fst ; Height = size.current |> snd |}) else fragment [] []
+        ]
+      else
+        fragment [] []
       div [Class "scannerBody"] [
         div [Style [
           Display DisplayOptions.Grid
@@ -105,7 +137,7 @@ let view warpDestinationOption discoveredSectors gameObjects (player:Player) dis
           label "Deflector"
           levelIndicator player.DeflectorDish
         ]
-        button [Class "warp" ; Disabled (canWarp |> not)] [str "Engage"]
+        button [Class "warp" ; Disabled (canWarp |> not) ; OnClick beginWarpClick ] [str "Engage"]
       ]    
     ]
     
@@ -113,3 +145,4 @@ let view warpDestinationOption discoveredSectors gameObjects (player:Player) dis
       div [Class "arrowDown"] []
     ]
   ]
+)

@@ -4,6 +4,11 @@ open Elmish
 open Game.Types
 
 
+let private warpAnimation position = async {
+  do! Async.Sleep (Interface.Animation.warpAnimationDurationMs)
+  return position |> EndWarpTo
+}
+
 let init () = Model.Empty, Cmd.none
 
 let update msg (model:Model) game =
@@ -15,7 +20,9 @@ let update msg (model:Model) game =
   | ShowLongRangeScanner ->
     { model with IsLongRangeScannerVisible = true }, Cmd.none
   | HideLongRangeScanner ->
-    { model with IsLongRangeScannerVisible = false}, Cmd.none
+    match model.IsWarping,model.WarpDestination with
+    | true, Some warpDestination -> model, Cmd.ofMsg (warpDestination |> EndWarpTo) // if we hide the scanner prematurely while warping we need to complete the move
+    | _, _ -> { model with IsLongRangeScannerVisible = false ; IsWarping = false ; WarpDestination = None }, Cmd.none
   | ShowShortRangeScannerMenu (position, menuItems) ->
     { model with ShortRangeScannerMenuItems = Some { Position = position ; MenuItems = menuItems }}, Cmd.none
   | HideShortRangeScannerMenu ->
@@ -33,5 +40,7 @@ let update msg (model:Model) game =
     | Some nextTarget ->
       { model with CurrentTarget = Some nextTarget ; FiringTargets = model.FiringTargets |> Seq.skip 1 |> Seq.toList }, Cmd.ofMsg (nextTarget |> FirePhasersAtTarget)
     | None -> { model with CurrentTarget = None }, Cmd.none
+  | BeginWarpTo position -> { model with IsWarping = true }, Cmd.OfAsync.result (warpAnimation position)
+  | EndWarpTo _ -> { model with IsWarping = false ; IsLongRangeScannerVisible = false ; WarpDestination = None }, Cmd.none
   | _ ->
     model, Cmd.none

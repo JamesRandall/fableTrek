@@ -83,6 +83,9 @@ let update msg model =
     | FirePhasersAtTarget position ->
       let (subModel, subCmd) = Interface.GameScreen.State.update subMsg extractedModel extractedGame
       model, Cmd.map GameDispatcherMsg (Cmd.ofMsg (position |> FirePhasersAtPosition |> UpdateGameState))
+    | EndWarpTo position ->
+      let (subModel, _) = Interface.GameScreen.State.update subMsg extractedModel extractedGame
+      { model with GameScreen = Some subModel }, Cmd.map GameDispatcherMsg ({extractedGame.Player.Position with GalacticPosition = position } |> MoveTo |> UpdateGameState |> Cmd.ofMsg)
     | _ ->
       let (subModel, subCmd) = Interface.GameScreen.State.update subMsg extractedModel extractedGame
       { model with GameScreen = Some subModel}, Cmd.map GameScreenDispatcherMsg subCmd
