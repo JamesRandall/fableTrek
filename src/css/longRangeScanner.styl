@@ -1,0 +1,75 @@
+.longRangeScanner
+  position absolute
+  z-index: $popoverZIndex
+  bottom: 0
+  left: 50%
+  transform: translate3d(-50%, -42px, 0)
+  
+  .scannerOuter
+    box-shadow: 3px 3px 3px #111
+
+  .scannerFooter
+    background-color: $menuBackground
+    padding: 2ch
+    propertyGrid()    
+
+  .scannerBody    
+    border-color: black
+    border-width: 2px
+    border-style: solid
+    border-radius: 4px
+    //border-left: 1px solid $menuBorderColor
+    //border-right: 1px solid $menuBorderColor
+    //border-bottom: 1px solid $menuBorderColor    
+    display: flex
+    flex-direction: column
+    justify-content: flex-start
+    align-items: stretch
+
+    .danger
+      color $danger
+    .safe
+      color $healthy
+    .noStarbase
+      color darkblue 
+    .starbase
+      color cyan 
+    .star
+      color rgb(252,186,3)
+    
+    .scannerCell
+      display: grid
+      grid-template-columns: 1fr 1fr 1fr
+      grid-gap: 0.75ch
+      padding: 1.5ch
+    .odd
+      background-color: rgba(0,48,0,0.9)
+      border-width: 1px
+      border-color: rgba(0,48,0,0.9)
+      border-style: solid
+      .undiscovered
+        color rgb(0,32,0)
+    .even
+      background-color: rgba(0,32,0,0.9)
+      border-width: 1px
+      border-color: rgba(0,32,0,0.9)
+      border-style: solid
+      .undiscovered
+        color rgb(0,48,0)
+
+    .playerSector
+      border-width: 1px
+      border-color: $healthy
+      border-style: solid
+    //.undiscovered
+    //  background-color: rgba(0,16,0,0.9)
+
+  .arrowDownContainer
+    display: flex
+    justify-content: center
+    .arrowDown
+      width: 0; 
+      height: 0; 
+      border-left: 15px solid transparent
+      border-right: 15px solid transparent  
+      border-top: 15px solid $menuBackground

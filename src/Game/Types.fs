@@ -21,6 +21,9 @@ type stardate
 [<Measure>]
 type score
 
+[<Measure>]
+type warp
+
 (*
 type RangeValue<'T> when 'T : (static member (-) : 'T * 'T -> 'T )
                      and 'T : (static member Zero: 'T)
@@ -45,17 +48,17 @@ type RangeValue<'T> when 'T : (static member (+) : 'T * 'T -> 'T )
                      and 'T : (static member Zero: 'T)
                      and 'T : comparison =
   { Max: ^T
+    Min: ^T
     Current: ^T
   }
   member inline rt.Update (newValue:^T) =
-    let zero:'T = LanguagePrimitives.GenericZero<'T>
     let rangeBoundValue =      
-      if newValue < zero then zero elif newValue > rt.Max then rt.Max else newValue
+      if newValue < rt.Min then rt.Min elif newValue > rt.Max then rt.Max else newValue
     { rt with Current = rangeBoundValue }  
-  member inline rt.Percentage = (rt.Current |> float)/(rt.Max |> float)
+  member inline rt.Percentage = ((rt.Current |> float)-(rt.Min |> float)) / ((rt.Max |> float) - (rt.Min |> float))
   member inline rt.PercentageAsString = sprintf "%.0f" (rt.Percentage * 100.) 
-  static member inline Create withMax = { Max = withMax ; Current = withMax }
-  static member inline CreateAt withValue withMax = { Max = withMax ; Current = withValue } 
+  static member inline Create withMax = { Max = withMax ; Current = withMax ; Min =  LanguagePrimitives.GenericZero<'T> }
+  static member inline CreateAt withValue withMax = { Max = withMax ; Current = withValue ; Min =  LanguagePrimitives.GenericZero<'T> } 
 
 type EnergyLevel = RangeValue<float<gigawatt>>
 
@@ -64,6 +67,8 @@ type HitPoints = RangeValue<float<hitpoints>>
 type Torpedos = RangeValue<int<torpedo>>
 
 type TemperatureGauge = RangeValue<float<celcius>>
+
+type WarpSpeed = RangeValue<float<warp>>
 
 type Position =
   {
@@ -124,6 +129,7 @@ type Player =
     Targets: GameWorldPosition list
     DockedWith: GameWorldPosition option
     CaptainsLog: CaptainsLogItem list
+    WarpSpeed: WarpSpeed
     // Systems
     Hull: HitPoints // what it says on the tin
     WarpDrive: HitPoints // enables warp travel
@@ -148,10 +154,11 @@ type Player =
       StarboardShields = EnergyLevel.Create 1000.<gigawatt>
       Torpedos = Torpedos.Create 9<torpedo>
       PhaserPower = EnergyLevel.CreateAt 400.<gigawatt> 750.<gigawatt>
-      PhaserTemperature = EnergyLevel.CreateAt 0.<celcius> 10000.<celcius>
+      PhaserTemperature = TemperatureGauge.CreateAt 0.<celcius> 10000.<celcius>
       Targets = List.empty
       DockedWith = None
       CaptainsLog = []
+      WarpSpeed = WarpSpeed.CreateAt 5.<warp> 10.<warp>
       // Systems
       Hull = HitPoints.Create 3000.<hitpoints>
       WarpDrive = HitPoints.Create 1500.<hitpoints>
@@ -195,6 +202,7 @@ type Game =
   { Difficulty: GameDifficulty
     GameObjects: GameObject array
     Player: Player
+    DiscoveredSectors: Position Set
     Stardate: float<stardate>
     Score: int<score>
   }
@@ -202,6 +210,7 @@ type Game =
     Difficulty = MediumDifficulty
     GameObjects = Array.empty
     Player = Player.Default
+    DiscoveredSectors = Set.empty
     Stardate = 2872.<stardate>
     Score = 0<score>
   }
@@ -213,6 +222,7 @@ type FiringResponse =
 
 type UpdateGameStateMsg =
   | SetPhaserPower of float<gigawatt>
+  | SetWarpSpeed of float<warp>
   | ToggleShields
   | MoveTo of GameWorldPosition
   | AddTarget of GameWorldPosition

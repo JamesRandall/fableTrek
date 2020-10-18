@@ -65,4 +65,7 @@ let inline levelIndicator (rangeValue:RangeValue<'T>) =
   genericLevelIndicator rangeValue foregroundClass 
 
 let inline rangeInput (range:RangeValue<'T>) onChange =
-  input [Type "range" ; Min 0 ; Max range.Max ; Value range.Current ; OnChange (fun ev -> onChange ev.Value)]
+  input [Type "range" ; Class "rangeRed" ; Min 0 ; Max range.Max ; Value range.Current ; OnChange (fun ev -> onChange ev.Value)]
+
+let inline greenRangeInput (range:RangeValue<'T>) onChange =
+  input [Type "range" ; Class "rangeGreen" ; Min 0 ; Max range.Max ; Value range.Current ; OnChange (fun ev -> onChange ev.Value)]

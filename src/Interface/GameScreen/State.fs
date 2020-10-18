@@ -8,6 +8,10 @@ let init () = Model.Empty, Cmd.none
 
 let update msg (model:Model) game =
   match msg with
+  | ShowLongRangeScanner ->
+    { model with IsLongRangeScannerVisible = true }, Cmd.none
+  | HideLongRangeScanner ->
+    { model with IsLongRangeScannerVisible = false}, Cmd.none
   | ShowShortRangeScannerMenu (position, menuItems) ->
     { model with ShortRangeScannerMenuItems = Some { Position = position ; MenuItems = menuItems }}, Cmd.none
   | HideShortRangeScannerMenu ->

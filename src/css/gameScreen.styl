@@ -59,10 +59,24 @@
             padding 6px
             height 32px
             width 32px
-
+            margin-right: 1ch
+          
         .bottomBarButtons
           standardPaddedPanel ()
           flex-grow: 1
+          display: grid
+          grid-gap: $gridSpacing
+          grid-template-columns: 1fr 1fr 1fr
+          position relative
+                    
+          .buttonContainer
+            display: flex
+            flex-direction: column
+            justify-content: center
+            position relative
+
+            button
+              retro-button(#222, #f33, #900)
 
       .sideBar
         overflow-y: auto
@@ -83,8 +97,8 @@
         padding-right: 16px
         display: grid
         grid-auto-flow: column
-        grid-gap: ($gridSpacing / 2)
-        grid-template-columns: 50% 50%
+        grid-gap: $gridSpacing
+        grid-template-columns: 1fr 1fr
 
         div
           display: flex

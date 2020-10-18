@@ -3,6 +3,7 @@ module Game.Factory
 open Types
 open Browser
 open Utils.Position
+open Rules.Sensors
 
 // there is lots of scope to optimise in here but we're not dealing with much data
 // and I'd rather keep the code simple for the sake of explanation
@@ -78,7 +79,11 @@ let createGame difficulty =
                           ForeShields = { Player.Default.ForeShields with Current = 900.<gigawatt>}
     }
     
-  { Game.Empty with Difficulty = difficulty ; GameObjects = gameObjects ; Player = gamePlayer }  
+  { Game.Empty with Difficulty = difficulty
+                    GameObjects = gameObjects
+                    Player = gamePlayer
+                    DiscoveredSectors = Set.empty |> discover gamePlayer
+  }  
 
 let canLoad () = not (localStorage.getItem("currentGame") |> isNull) 
 

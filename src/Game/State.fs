@@ -15,6 +15,7 @@ let updatePlayerState msg game =
   match msg with
   | ToggleShields -> { playerModel with ShieldsRaised = not(playerModel.ShieldsRaised)} |> updateGameWithPlayer
   | SetPhaserPower newPower -> { playerModel with PhaserPower = playerModel.PhaserPower.Update newPower } |> updateGameWithPlayer
+  | SetWarpSpeed newSpeed -> { playerModel with WarpSpeed = playerModel.WarpSpeed.Update newSpeed } |> updateGameWithPlayer
   | MoveTo newPosition ->  
     match Game.Rules.Movement.move playerModel game.GameObjects newPosition with
     | Ok newPlayer -> newPlayer |> updateGameWithPlayer

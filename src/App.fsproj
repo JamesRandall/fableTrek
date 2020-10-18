@@ -22,6 +22,7 @@
     <Compile Include="Interface/GameScreen/Units/PixelatedScout.fs" />
     <Compile Include="Interface/GameScreen/Units/Vector.fs" />
     <Compile Include="Interface/GameScreen/ShortRangeScanner.fs" />
+    <Compile Include="Interface/GameScreen/LongRangeScanner.fs" />
     <Compile Include="Interface/GameScreen/EnergyManagement.fs" />
     <Compile Include="Interface/GameScreen/Weapons.fs" />
     <Compile Include="Interface/GameScreen/View.fs" />

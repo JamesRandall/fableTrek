@@ -1,6 +1,7 @@
 $rangePickerBarHeight = 8px
 $rangePickerThumbHeight = 24px
 $trackColor = rgba(255,0,0,0.2)
+$greenTrackColor = rgba(0,255,0,0.2)
 
 input[type=range] {
   -webkit-appearance: none;
@@ -11,7 +12,7 @@ input[type=range] {
 input[type=range]:focus {
   outline: none;
 }
-input[type=range]::-webkit-slider-runnable-track {
+input[type=range].rangeRed::-webkit-slider-runnable-track {
   width: 100%;
   height: $rangePickerBarHeight;
   cursor: pointer;
@@ -20,7 +21,7 @@ input[type=range]::-webkit-slider-runnable-track {
   border-radius: 25px;
   border: 0px solid #000101;
 }
-input[type=range]::-webkit-slider-thumb {
+input[type=range].rangeRed::-webkit-slider-thumb {
   box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
   border: 0px solid #000000;
   height: $rangePickerThumbHeight;
@@ -31,10 +32,10 @@ input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
   margin-top: -($rangePickerBarHeight);
 }
-input[type=range]:focus::-webkit-slider-runnable-track {
+input[type=range].rangeRed:focus::-webkit-slider-runnable-track {
   background: dangerAlpha(0.4);
 }
-input[type=range]::-moz-range-track {
+input[type=range].rangeRed::-moz-range-track {
   width: 100%;
   height: $rangePickerBarHeight;
   cursor: pointer;
@@ -44,13 +45,56 @@ input[type=range]::-moz-range-track {
   border-radius: 25px;
   border: 0px solid #000101;
 }
-input[type=range]::-moz-range-thumb {
+input[type=range].rangeRed::-moz-range-thumb {
   box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
   border: 0px solid #000000;
   height: $rangePickerThumbHeight;
   width: $rangePickerThumbHeight;
   border-radius: $rangePickerThumbHeight
   background: $danger;
+  cursor: pointer;
+}
+
+input[type=range].rangeGreen::-webkit-slider-runnable-track {
+  width: 100%;
+  height: $rangePickerBarHeight;
+  cursor: pointer;
+  box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+  background: $greenTrackColor
+  border-radius: 25px;
+  border: 0px solid #000101;
+}
+input[type=range].rangeGreen::-webkit-slider-thumb {
+  box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+  border: 0px solid #000000;
+  height: $rangePickerThumbHeight;
+  width: $rangePickerThumbHeight;
+  border-radius: $rangePickerThumbHeight
+  background: $healthy;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -($rangePickerBarHeight);
+}
+input[type=range].rangeGreen:focus::-webkit-slider-runnable-track {
+  background: healthyAlpha(0.4);
+}
+input[type=range].rangeGreen::-moz-range-track {
+  width: 100%;
+  height: $rangePickerBarHeight;
+  cursor: pointer;
+  animate: 0.2s;
+  box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+  background:  $greenTrackColor
+  border-radius: 25px;
+  border: 0px solid #000101;
+}
+input[type=range].rangeGreen::-moz-range-thumb {
+  box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+  border: 0px solid #000000;
+  height: $rangePickerThumbHeight;
+  width: $rangePickerThumbHeight;
+  border-radius: $rangePickerThumbHeight
+  background: $healthy;
   cursor: pointer;
 }
 

@@ -127,3 +127,16 @@ module Movement =
       Error "Insufficient energy to move to that location"
     | _, false ->
       Error "Object blocking move"
+
+module Sensors =
+  let discover (player:Player) alreadyFound =
+    // todo - make it a hashset
+    let pos = player.Position.GalacticPosition
+    let newPositions =
+      seq {
+        for y = (max (pos.Y-1<coordinatecomponent> |> int) 0) to (min (pos.Y+1<coordinatecomponent> |> int) (GameWorldPosition.Max.GalacticPosition.Y |> int)) do
+          for x = (max (pos.X-1<coordinatecomponent> |> int) 0) to (min (pos.X+1<coordinatecomponent> |> int) (GameWorldPosition.Max.GalacticPosition.X |> int)) do
+            yield { X = x*1<coordinatecomponent> ; Y = y*1<coordinatecomponent>}
+      }
+      |> Set.ofSeq
+    alreadyFound |> Set.union newPositions

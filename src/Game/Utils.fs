@@ -26,13 +26,14 @@ module Position =
   
   let randomPositions =    
     let newRandomPosition () =
+      // Note that Next(min,max) - min is inclusive, max is exclusive
       { GalacticPosition =
-          { X = random.Next(0, GameWorldPosition.Max.GalacticPosition.X |> int) * 1<coordinatecomponent>
-            Y = random.Next(0, GameWorldPosition.Max.GalacticPosition.Y |> int) * 1<coordinatecomponent>
+          { X = random.Next(0, (GameWorldPosition.Max.GalacticPosition.X |> int) + 1) * 1<coordinatecomponent>
+            Y = random.Next(0, (GameWorldPosition.Max.GalacticPosition.Y |> int) + 1) * 1<coordinatecomponent>
           }
         SectorPosition = 
-          { X = random.Next(0, GameWorldPosition.Max.SectorPosition.X |> int) * 1<coordinatecomponent>
-            Y = random.Next(0, GameWorldPosition.Max.SectorPosition.Y |> int) * 1<coordinatecomponent>
+          { X = random.Next(0, (GameWorldPosition.Max.SectorPosition.X |> int) + 1) * 1<coordinatecomponent>
+            Y = random.Next(0, (GameWorldPosition.Max.SectorPosition.Y |> int) + 1) * 1<coordinatecomponent>
           }
       }
     seq { while true do yield newRandomPosition () }
@@ -47,6 +48,13 @@ module Position =
     seq {
       for x in 0..(GameWorldPosition.Max.SectorPosition.X |> int) do
         for y in 0..(GameWorldPosition.Max.SectorPosition.Y |> int) do
+          yield { X =x * 1<coordinatecomponent> ; Y = y * 1<coordinatecomponent> }
+    }
+
+  let galacticCoordinateIterator () =
+    seq {
+      for x in 0..(GameWorldPosition.Max.GalacticPosition.X |> int) do
+        for y in 0..(GameWorldPosition.Max.GalacticPosition.Y |> int) do
           yield { X =x * 1<coordinatecomponent> ; Y = y * 1<coordinatecomponent> }
     }
 
