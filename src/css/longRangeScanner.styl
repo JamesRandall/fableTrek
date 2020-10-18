@@ -11,7 +11,14 @@
   .scannerFooter
     background-color: $menuBackground
     padding: 2ch
-    propertyGrid()    
+    display grid
+    grid-template-columns: 8fr 2fr
+    grid-gap $propertyGridColGap
+    .gauges
+      propertyGrid()
+    button.warp
+      retro-button(#D97700, #f33, #7A4300)
+
 
   .scannerBody    
     border-color: black
@@ -42,6 +49,7 @@
       grid-template-columns: 1fr 1fr 1fr
       grid-gap: 0.75ch
       padding: 1.5ch
+      cursor: pointer
     .odd
       background-color: rgba(0,48,0,0.9)
       border-width: 1px
@@ -57,9 +65,13 @@
       .undiscovered
         color rgb(0,48,0)
 
-    .playerSector
+    .warpDestination
       border-width: 1px
       border-color: $healthy
+      border-style: solid
+    .playerSector
+      border-width: 1px
+      border-color: cyan
       border-style: solid
     //.undiscovered
     //  background-color: rgba(0,16,0,0.9)

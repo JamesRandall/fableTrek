@@ -113,10 +113,28 @@ module Movement =
       let energyCost = player.ImpulseMovementCost * (player.ImpulseDrive |> inefficiencyFactor) * distance
       energyCost
     else
-      1000.<gigawatt>
+      let distance = player.Position.GalacticPosition.DistanceTo newPosition.GalacticPosition
+      let energyCostAtSpeed = player.EnergyCostPerUnitOfTravel * (1.-System.Math.Log((11.-(player.WarpSpeed.Current |> float))/2., 5.5))
+      let energyCostAtSpeedAndDamage = energyCostAtSpeed * (inefficiencyFactor player.WarpDrive)
+      let totalEnergyCost = distance * energyCostAtSpeedAndDamage      
+      Fable.Core.JS.console.log(sprintf "Total energy cost at warp %f: %f" player.WarpSpeed.Current totalEnergyCost)
+      totalEnergyCost
 
-  let canMove player newPosition =
-    (energyRequirementsForMove player newPosition) <= player.Energy.Current
+  let energyGeneratedByEnergyConverter (player:Player) newPosition =
+    let distance = player.Position.GalacticPosition.DistanceTo newPosition.GalacticPosition
+    let energyGeneratedAtSpeed = player.EnergyGeneratedPerUnitOfTravel * System.Math.Log(11.-(player.WarpSpeed.Current |> float), 11.)
+    let energyGeneratedAtSpeedAndDamage = energyGeneratedAtSpeed * (efficiencyFactor player.EnergyConverter)
+    let totalEnergyGenerated = distance * energyGeneratedAtSpeedAndDamage
+    Fable.Core.JS.console.log(sprintf "Total energy generated at warp %f: %f" player.WarpSpeed.Current totalEnergyGenerated)
+    totalEnergyGenerated
+
+  let canMove (player:Player) newPosition =
+    if newPosition.GalacticPosition = player.Position.GalacticPosition then
+      (energyRequirementsForMove player newPosition) <= player.Energy.Current
+    else
+      let totalEnergyCost = (energyRequirementsForMove player newPosition) - (energyGeneratedByEnergyConverter player newPosition)
+      Fable.Core.JS.console.log(sprintf "Total energy cost at warp %f: %f" player.WarpSpeed.Current totalEnergyCost)
+      (player.Energy.Current - totalEnergyCost) >= 0.<gigawatt>
 
   let move player gameObjects newPosition =
     let energyRequirements = energyRequirementsForMove player newPosition

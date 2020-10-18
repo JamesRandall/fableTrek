@@ -60,8 +60,6 @@ let pixelatedScout = FunctionComponent.Of (fun (props:{| dispatch:GameScreenMsg-
   )    
 *)
 
-  Fable.Core.JS.console.log("rendering pixelated scout")
-  
   pixelatedUnitSvg width height  [|
     g [Class "explodingScout"] [|
       rect [SVGAttr.X "46" ; SVGAttr.Y "0" ; SVGAttr.Width "2" ; SVGAttr.Height "2" ; SVGAttr.Fill "rgba(255,0,0,255)"][]

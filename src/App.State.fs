@@ -77,7 +77,6 @@ let update msg model =
   | (StartScreenDispatcherMsg subMsg, { StartScreen = Some extractedModel }) ->
     match subMsg with
     | Interface.StartScreen.Types.StartNewGame difficulty ->      
-      console.log("Dispatching new game")
       { model with CurrentGame = difficulty |> Game.Factory.createGame |> Some }, Cmd.ofMsg (GameScreenPage |> GotoPage)        
   | (GameScreenDispatcherMsg subMsg, { GameScreen = Some extractedModel ; CurrentGame = Some extractedGame }) ->
     match subMsg with

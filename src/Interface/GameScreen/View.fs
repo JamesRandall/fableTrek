@@ -33,11 +33,11 @@ let root game gameDispatch model dispatch =
           ]
           div [Class "bottomBarButtons"] [
             div[Class "buttonContainer"] [
-              match model.IsLongRangeScannerVisible with | true -> LongRangeScanner.view game.DiscoveredSectors game.GameObjects game.Player gameDispatch | false -> fragment [] []
-              button [Disabled model.IsUiDisabled ; OnClick (fun _ -> ShowLongRangeScanner |> dispatch)] [str "Long Range"]
+              match model.IsLongRangeScannerVisible with | true -> LongRangeScanner.view model.WarpDestination game.DiscoveredSectors game.GameObjects game.Player dispatch gameDispatch | false -> fragment [] []
+              button [Class "plain" ; Disabled model.IsUiDisabled ; OnClick (fun _ -> ShowLongRangeScanner |> dispatch)] [str "Long Range"]
             ]
-            div[Class "buttonContainer"] [button [Disabled model.IsUiDisabled] [str "Damage Control"]]
-            div[Class "buttonContainer"] [button [Disabled model.IsUiDisabled] [str "Log"]]
+            div[Class "buttonContainer"] [button [Class "plain" ; Disabled model.IsUiDisabled] [str "Damage Control"]]
+            div[Class "buttonContainer"] [button [Class "plain" ; Disabled model.IsUiDisabled] [str "Log"]]
           ]
         ]
         div [Class "sideBar"] [

@@ -19,6 +19,7 @@ type Model =
     FiringTargets: GameWorldPosition list
     CurrentTarget: GameWorldPosition option
     Explosions: Explosion list
+    WarpDestination: Position option
   }
   static member Empty =
     { IsUiDisabled = false
@@ -27,6 +28,7 @@ type Model =
       FiringTargets = List.empty
       CurrentTarget = None
       Explosions = List.empty
+      WarpDestination = None
     }
 
 type GameScreenMsg =
@@ -42,3 +44,5 @@ type GameScreenMsg =
   | HidePhasers
   | DisableUi
   | EnableUi
+  | SetWarpDestination of Position
+  | RemoveWarpDestination

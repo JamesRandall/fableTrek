@@ -46,7 +46,6 @@ let arc x y radius startAngle endAngle attributes =
 open Game.Types
 
 let inline genericLevelIndicator (rangeValue:RangeValue<'T>) foregroundClass =
-  Fable.Core.JS.console.log(rangeValue.PercentageAsString)
   div [Class "levelIndicator"] [
     div [Class "levelIndicatorBackground"] [
       div [Class foregroundClass ; Style [Width (sprintf "%s%%" rangeValue.PercentageAsString)]] []
@@ -60,12 +59,11 @@ let inline invertedLevelIndicator (rangeValue:RangeValue<'T>) =
 
 let inline levelIndicator (rangeValue:RangeValue<'T>) =
   let percentage = rangeValue.Percentage
-  Fable.Core.JS.console.log(percentage)
   let foregroundClass = "levelIndicatorForeground" + (if percentage > 0.5 then "Healthy" elif percentage > 0.25 then "Warning" else "Danger")
   genericLevelIndicator rangeValue foregroundClass 
 
 let inline rangeInput (range:RangeValue<'T>) onChange =
-  input [Type "range" ; Class "rangeRed" ; Min 0 ; Max range.Max ; Value range.Current ; OnChange (fun ev -> onChange ev.Value)]
+  input [Type "range" ; Class "rangeRed" ; Min range.Min ; Max range.Max ; Value range.Current ; OnChange (fun ev -> onChange ev.Value)]
 
 let inline greenRangeInput (range:RangeValue<'T>) onChange =
-  input [Type "range" ; Class "rangeGreen" ; Min 0 ; Max range.Max ; Value range.Current ; OnChange (fun ev -> onChange ev.Value)]
+  input [Type "range" ; Class "rangeGreen" ; Min range.Min ; Max range.Max ; Value range.Current ; OnChange (fun ev -> onChange ev.Value)]

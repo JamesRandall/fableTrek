@@ -8,6 +8,10 @@ let init () = Model.Empty, Cmd.none
 
 let update msg (model:Model) game =
   match msg with
+  | SetWarpDestination p ->
+    { model with WarpDestination = p |> Some }, Cmd.none
+  | RemoveWarpDestination ->
+    { model with WarpDestination = None }, Cmd.none
   | ShowLongRangeScanner ->
     { model with IsLongRangeScannerVisible = true }, Cmd.none
   | HideLongRangeScanner ->

@@ -4,6 +4,8 @@ open Fable.React
 open Fable.React.Props
 open Interface.Common
 open Game.Types
+open Types
+open Game.Rules.Movement
 
 type SectorSummary =
   { Position: Position
@@ -25,12 +27,16 @@ let calculateSummaries (gameObjects:GameObject seq) (player:Player) =
     }
   )
 
-let view discoveredSectors gameObjects player dispatch =  
+let view warpDestinationOption discoveredSectors gameObjects (player:Player) dispatch gameDispatch =  
   let intLabel (colorClass,intValue) =
     div [Class (sprintf "label %s" colorClass)] [str (sprintf "%d" intValue)]
   let textLabel (colorClass,strValue) =
     div [Class (sprintf "label %s" colorClass)] [str (sprintf "%s" strValue)]
   
+  let canWarp =
+    match warpDestinationOption with
+    | Some warpDestination -> canMove player { player.Position with GalacticPosition = warpDestination }
+    | None -> false
   let summaries = calculateSummaries gameObjects player
   let templateColumns = "1fr " |> Seq.replicate (GameWorldPosition.Max.GalacticPosition.X + 1<coordinatecomponent> |> int) |> System.String.Concat
   div [Class "longRangeScanner"] [
@@ -44,32 +50,42 @@ let view discoveredSectors gameObjects player dispatch =
         ]] (
           Game.Utils.Position.galacticCoordinateIterator () |> Seq.map (fun position ->
             let optionalSummary = summaries |> Seq.tryFind(fun s -> s.Position = position)
-            let cellClass =
+            let baseCellClass =
               if (((position.Y |> int) + ((position.X |> int) % 2)) % 2) = 0 then
                 "scannerCell even"
               else
                 "scannerCell odd"
+            let cellClass,onClickHandler =
+              let baseClickHandler =
+                if player.Position.GalacticPosition = position then
+                  (fun _ -> RemoveWarpDestination |> dispatch)
+                else
+                  (fun _ -> position |> SetWarpDestination |> dispatch)
+              match warpDestinationOption with
+              | Some warpDestination ->
+                (if warpDestination = position then (sprintf "%s %s" baseCellClass "warpDestination"),ignore else baseCellClass,baseClickHandler)
+              | None -> (baseCellClass, baseClickHandler)
             div [Style [GridColumn (position.X+1<coordinatecomponent>) ; GridRow (position.Y+1<coordinatecomponent>)]] [            
                (
                 match discoveredSectors |> Seq.contains position with
                 | true ->
                   match optionalSummary with
-                  | Some summary ->              
-                    div [Class (sprintf "%s %s" cellClass (if summary.IsPlayerInSector then "playerSector" else ""))]
+                  | Some summary ->                  
+                    div [Class (sprintf "%s %s" cellClass (if summary.IsPlayerInSector then "playerSector" else "")) ; OnClick onClickHandler]
                       [
                         intLabel ((if summary.EnemyCount > 0 then "danger" else "safe"),summary.EnemyCount)
                         intLabel (if summary.IsStarbaseInSector then ("noStarbase",0) else ("starbase", 1))
                         intLabel ("star",summary.StarCount)
                       ]              
                   | None ->
-                    div [Class cellClass]
+                    div [Class cellClass ; OnClick onClickHandler]
                       [
                         intLabel ("safe",0)
                         intLabel ("noStarbase",0)
                         intLabel ("star", 0)
                       ]
                 | false ->
-                  div [Class cellClass]
+                  div [Class cellClass ; OnClick onClickHandler]
                     [
                       textLabel ("undiscovered","?")
                       textLabel ("undiscovered","?")
@@ -81,12 +97,15 @@ let view discoveredSectors gameObjects player dispatch =
         )
       ]
       div [Class "scannerFooter"] [
-        label "Speed"
-        greenRangeInput player.WarpSpeed (fun newValue ->  float newValue * 1.<warp> |> SetWarpSpeed |> UpdateGameState |> dispatch)
-        label "Engines"
-        levelIndicator player.WarpDrive
-        label "Deflector"
-        levelIndicator player.DeflectorDish
+        div [Class "gauges"] [
+          label "Speed"
+          greenRangeInput player.WarpSpeed (fun newValue ->  float newValue * 1.<warp> |> SetWarpSpeed |> UpdateGameState |> gameDispatch)
+          label "Engines"
+          levelIndicator player.WarpDrive
+          label "Deflector"
+          levelIndicator player.DeflectorDish
+        ]
+        button [Class "warp" ; Disabled (canWarp |> not)] [str "Engage"]
       ]    
     ]
     

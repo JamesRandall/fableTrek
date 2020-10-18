@@ -59,6 +59,7 @@ type RangeValue<'T> when 'T : (static member (+) : 'T * 'T -> 'T )
   member inline rt.PercentageAsString = sprintf "%.0f" (rt.Percentage * 100.) 
   static member inline Create withMax = { Max = withMax ; Current = withMax ; Min =  LanguagePrimitives.GenericZero<'T> }
   static member inline CreateAt withValue withMax = { Max = withMax ; Current = withValue ; Min =  LanguagePrimitives.GenericZero<'T> } 
+  static member inline CreateWithMinMax withValue withMin withMax = { Min = withMin ; Max = withMax ; Current = withValue } 
 
 type EnergyLevel = RangeValue<float<gigawatt>>
 
@@ -142,6 +143,8 @@ type Player =
     // Energy costs
     ImpulseMovementCost: float<gigawatt>
     PhaserTemperatureCostPerGigawatt: float<celcius>
+    EnergyGeneratedPerUnitOfTravel: float<gigawatt>
+    EnergyCostPerUnitOfTravel: float<gigawatt>
   }
   static member Default =
     {
@@ -158,7 +161,7 @@ type Player =
       Targets = List.empty
       DockedWith = None
       CaptainsLog = []
-      WarpSpeed = WarpSpeed.CreateAt 5.<warp> 10.<warp>
+      WarpSpeed = WarpSpeed.CreateWithMinMax 5.<warp> 1.<warp> 10.<warp>
       // Systems
       Hull = HitPoints.Create 3000.<hitpoints>
       WarpDrive = HitPoints.Create 1500.<hitpoints>
@@ -171,6 +174,8 @@ type Player =
       // Energy costs
       ImpulseMovementCost = 50.<gigawatt>
       PhaserTemperatureCostPerGigawatt = 1.5<celcius>
+      EnergyGeneratedPerUnitOfTravel = 400.<gigawatt>
+      EnergyCostPerUnitOfTravel = 650.<gigawatt>
     }
 
 type GameObjectAttributes =
