@@ -33,7 +33,8 @@ let update msg (model:Model) game =
     | Some nextTarget ->
       { model with CurrentTarget = Some nextTarget ; FiringTargets = model.FiringTargets |> Seq.skip 1 |> Seq.toList }, Cmd.ofMsg (nextTarget |> FirePhasersAtTarget)
     | None -> { model with CurrentTarget = None }, Cmd.none
-  | BeginWarpTo position -> { model with IsWarping = true }, Cmd.none
-  | EndWarpTo -> { model with IsWarping = false ; IsLongRangeScannerVisible = false ; WarpDestination = None }, Cmd.none
+  | BeginWarpTo _ -> { model with IsWarping = true }, Cmd.none
+  | EndWarpTo ->
+    (if model.IsWarping then { model with IsWarping = false ; IsLongRangeScannerVisible = false ; WarpDestination = None } else model ), Cmd.none
   | _ ->
     model, Cmd.none

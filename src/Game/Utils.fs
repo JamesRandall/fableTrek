@@ -38,11 +38,26 @@ module Position =
       }
     seq { while true do yield newRandomPosition () }
 
+  let randomSectorPositions galacticPosition =    
+    let newRandomPosition () =
+      // Note that Next(min,max) - min is inclusive, max is exclusive
+      { GalacticPosition = galacticPosition
+        SectorPosition = 
+          { X = random.Next(0, (GameWorldPosition.Max.SectorPosition.X |> int) + 1) * 1<coordinatecomponent>
+            Y = random.Next(0, (GameWorldPosition.Max.SectorPosition.Y |> int) + 1) * 1<coordinatecomponent>
+          }
+      }
+    seq { while true do yield newRandomPosition () }
+
   let positionIsVacant gameObjects position =
     gameObjects |> Seq.tryFind (fun go -> go.Position = position) |> Option.isNone
 
   let findRandomAndVacantGalacticPosition gameObjects =
     randomPositions |> Seq.skipWhile (positionIsVacant gameObjects >> not) |> Seq.head
+
+  let findRandomAndVacantSectorPosition gameObjects galacticPosition  =
+    let sectorGameObjects = gameObjects |> Seq.filter(fun go -> go.Position.GalacticPosition = galacticPosition) |> Seq.toArray
+    (galacticPosition |> randomSectorPositions |> Seq.skipWhile (positionIsVacant sectorGameObjects >> not) |> Seq.head).SectorPosition
 
   let sectorCoordinateIterator () =
     seq {

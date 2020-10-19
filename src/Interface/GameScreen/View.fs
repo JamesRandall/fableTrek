@@ -26,7 +26,7 @@ let root = FunctionComponent.Of(fun (props:{| Game:Game ; GameDispatch:GameMsg->
   let currentObjects = game |> currentSectorObjects |> Seq.toArray
   div [Class "gameScreen" ; RefHook starfieldContainerRef] [
     if model.IsWarping then
-      div [Class "starfield" ] [
+      div [Class "starfield" ; OnClick (fun _ -> EndWarpTo |> dispatch) ] [
         if (size.current |> fst) > -1 then StarField.view ({| Width = size.current |> fst ; Height = size.current |> snd |}) else fragment [] []
       ]
     else

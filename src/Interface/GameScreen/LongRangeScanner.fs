@@ -72,10 +72,8 @@ let view = FunctionComponent.Of(fun (props:{| WarpDestinationOption: Position op
           Game.Utils.Position.galacticCoordinateIterator () |> Seq.map (fun position ->
             let optionalSummary = summaries |> Seq.tryFind(fun s -> s.Position = position)
             let baseCellClass =
-              if (((position.Y |> int) + ((position.X |> int) % 2)) % 2) = 0 then
-                "scannerCell even"
-              else
-                "scannerCell odd"
+              let evenOdd = if (((position.Y |> int) + ((position.X |> int) % 2)) % 2) = 0 then "even" else "odd"
+              sprintf "scannerCell %s %s" evenOdd (if player.Position.GalacticPosition = position then "playerSector" else "")
             let cellClass,onClickHandler =
               let baseClickHandler =
                 if player.Position.GalacticPosition = position then
@@ -92,7 +90,7 @@ let view = FunctionComponent.Of(fun (props:{| WarpDestinationOption: Position op
                 | true ->
                   match optionalSummary with
                   | Some summary ->                  
-                    div [Class (sprintf "%s %s" cellClass (if summary.IsPlayerInSector then "playerSector" else "")) ; OnClick onClickHandler]
+                    div [Class cellClass ; OnClick onClickHandler]
                       [
                         intLabel ((if summary.EnemyCount > 0 then "danger" else "safe"),summary.EnemyCount)
                         intLabel (if summary.IsStarbaseInSector then ("noStarbase",0) else ("starbase", 1))
