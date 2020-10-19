@@ -229,7 +229,8 @@ type UpdateGameStateMsg =
   | SetPhaserPower of float<gigawatt>
   | SetWarpSpeed of float<warp>
   | ToggleShields
-  | MoveTo of GameWorldPosition
+  | ImpulseTo of GameWorldPosition
+  | WarpTo of GameWorldPosition
   | AddTarget of GameWorldPosition
   | RemoveTarget of GameWorldPosition
   | Dock of GameWorldPosition

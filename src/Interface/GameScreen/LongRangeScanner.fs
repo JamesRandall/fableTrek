@@ -36,11 +36,6 @@ let view = FunctionComponent.Of(fun (props:{| WarpDestinationOption: Position op
                                               Dispatch: GameScreenMsg -> unit
                                               GameDispatch: GameMsg -> unit
                                            |}) ->
-  let size = Hooks.useState(-1,-1)
-  let starfieldContainerRef = Hooks.useRef None
-
-  debouncedSize starfieldContainerRef size.update
-
   let warpDestinationOption = props.WarpDestinationOption
   let discoveredSectors = props.DiscoveredSectors
   let gameObjects = props.GameObjects
@@ -66,13 +61,7 @@ let view = FunctionComponent.Of(fun (props:{| WarpDestinationOption: Position op
   let summaries = calculateSummaries gameObjects player
   let templateColumns = "1fr " |> Seq.replicate (GameWorldPosition.Max.GalacticPosition.X + 1<coordinatecomponent> |> int) |> System.String.Concat
   div [Class "longRangeScanner"] [
-    div [Class "scannerOuter" ; RefHook starfieldContainerRef] [
-      if props.IsWarping then
-        div [Class "starfield"] [
-          if (size.current |> fst) > -1 then StarField.view ({| Width = size.current |> fst ; Height = size.current |> snd |}) else fragment [] []
-        ]
-      else
-        fragment [] []
+    div [Class "scannerOuter"] [
       div [Class "scannerBody"] [
         div [Style [
           Display DisplayOptions.Grid

@@ -16,9 +16,13 @@ let updatePlayerState msg game =
   | ToggleShields -> { playerModel with ShieldsRaised = not(playerModel.ShieldsRaised)} |> updateGameWithPlayer
   | SetPhaserPower newPower -> { playerModel with PhaserPower = playerModel.PhaserPower.Update newPower } |> updateGameWithPlayer
   | SetWarpSpeed newSpeed -> { playerModel with WarpSpeed = playerModel.WarpSpeed.Update newSpeed } |> updateGameWithPlayer
-  | MoveTo newPosition ->  
+  | ImpulseTo newPosition ->  
     match Game.Rules.Movement.move playerModel game.GameObjects newPosition with
     | Ok newPlayer -> newPlayer |> updateGameWithPlayer
+    | Error errorMessage -> (errorMessage |> Warning |> appendToCaptainsLog playerModel) |> updateGameWithPlayer
+  | WarpTo newPosition ->  
+    match Game.Rules.Movement.move playerModel game.GameObjects newPosition with
+    | Ok newPlayer -> { game with Player = newPlayer ; DiscoveredSectors = game.DiscoveredSectors |> Game.Rules.Sensors.discover newPlayer }, Cmd.none
     | Error errorMessage -> (errorMessage |> Warning |> appendToCaptainsLog playerModel) |> updateGameWithPlayer
   | AddTarget position ->
     match Utils.GameWorld.objectAtPosition game.GameObjects position with

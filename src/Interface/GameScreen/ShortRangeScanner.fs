@@ -33,7 +33,7 @@ module Menu =
       if player.Position = position then
         [|"USS Discovery" |> NoActionLabel|]
       elif canMove player position then
-        [|("Move to", position |> MoveTo) |> MenuItem|]
+        [|("Move to", position |> ImpulseTo) |> MenuItem|]
       else
         [|"Insufficient energy to move here" |> NoActionLabel |]
 

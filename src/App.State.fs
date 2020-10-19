@@ -47,11 +47,16 @@ let private sleepThenFireNextPhasers = async {
   return FirePhasersAtNextTarget |> GameScreenDispatcherMsg
 }
 
+let private endWarpAnimation = async {
+  do! Async.Sleep (Interface.Animation.warpAnimationDurationMs)
+  return EndWarpTo |> GameScreenDispatcherMsg
+}
+
 let preGameUpdateMessage gameDispatcherMsg =
   match gameDispatcherMsg with
   | UpdateGameState subMsg ->
     match subMsg with
-    | MoveTo _ ->
+    | ImpulseTo _ ->
       Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg DisableUi)
     | _ -> Cmd.none
   | _ -> Cmd.none
@@ -60,7 +65,9 @@ let postGameUpdateMessage gameDispatcherMsg =
   match gameDispatcherMsg with
   | UpdateGameState subMsg ->
     match subMsg with
-    | MoveTo _ ->
+    | WarpTo _ ->
+      Cmd.OfAsync.result (endWarpAnimation)
+    | ImpulseTo _ ->
       Cmd.batch [
         Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg HideShortRangeScannerMenu)
         Cmd.OfAsync.result (animationSleep ())
@@ -83,9 +90,9 @@ let update msg model =
     | FirePhasersAtTarget position ->
       let (subModel, subCmd) = Interface.GameScreen.State.update subMsg extractedModel extractedGame
       model, Cmd.map GameDispatcherMsg (Cmd.ofMsg (position |> FirePhasersAtPosition |> UpdateGameState))
-    | EndWarpTo position ->
+    | BeginWarpTo position ->
       let (subModel, _) = Interface.GameScreen.State.update subMsg extractedModel extractedGame
-      { model with GameScreen = Some subModel }, Cmd.map GameDispatcherMsg ({extractedGame.Player.Position with GalacticPosition = position } |> MoveTo |> UpdateGameState |> Cmd.ofMsg)
+      { model with GameScreen = Some subModel }, Cmd.map GameDispatcherMsg ({extractedGame.Player.Position with GalacticPosition = position } |> WarpTo |> UpdateGameState |> Cmd.ofMsg)
     | _ ->
       let (subModel, subCmd) = Interface.GameScreen.State.update subMsg extractedModel extractedGame
       { model with GameScreen = Some subModel}, Cmd.map GameScreenDispatcherMsg subCmd

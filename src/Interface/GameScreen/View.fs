@@ -5,14 +5,32 @@ open Fable.React
 open Fable.React.Props
 open Game.Utils.GameWorld
 open Game.Rules.Weapons
+open Game.Types
+open Types
+open Interface.Browser.Helpers
 
 
 let transparentPopoverOverlay onClose =
   div [Class "transparentPopoverOverlay" ; OnClick (fun _ -> onClose ())] []
 
-let root game gameDispatch model dispatch =
+let root = FunctionComponent.Of(fun (props:{| Game:Game ; GameDispatch:GameMsg->unit ; Model:Model ; Dispatch:GameScreenMsg->unit |}) ->
+  let game = props.Game
+  let gameDispatch = props.GameDispatch
+  let dispatch = props.Dispatch
+  let model = props.Model
+
+  let size = Hooks.useState(-1,-1)
+  let starfieldContainerRef = Hooks.useRef None
+  debouncedSize starfieldContainerRef size.update
+  
   let currentObjects = game |> currentSectorObjects |> Seq.toArray
-  div [Class "gameScreen"] [
+  div [Class "gameScreen" ; RefHook starfieldContainerRef] [
+    if model.IsWarping then
+      div [Class "starfield" ] [
+        if (size.current |> fst) > -1 then StarField.view ({| Width = size.current |> fst ; Height = size.current |> snd |}) else fragment [] []
+      ]
+    else
+      fragment [] []
     // Units.Vector.renderUnitStrip
     match model.ShortRangeScannerMenuItems with | Some _ -> transparentPopoverOverlay (fun () -> HideShortRangeScannerMenu |> dispatch) | None -> fragment [] []
     match model.IsLongRangeScannerVisible with | true -> transparentPopoverOverlay (fun () -> HideLongRangeScanner |> dispatch) | false -> fragment [] []
@@ -63,3 +81,4 @@ let root game gameDispatch model dispatch =
       ]
     ]
   ]    
+)

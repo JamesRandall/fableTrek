@@ -49,4 +49,4 @@ type GameScreenMsg =
   | SetWarpDestination of Position
   | RemoveWarpDestination
   | BeginWarpTo of Position
-  | EndWarpTo of Position
+  | EndWarpTo

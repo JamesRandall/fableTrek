@@ -15,7 +15,7 @@ let root model dispatch =
     | { CurrentPage = Router.Page.StartScreenPage ; StartScreen = Some extractedModel } ->
       Interface.StartScreen.View.root model (StartScreenDispatcherMsg >> dispatch)
     | { CurrentPage = Router.Page.GameScreenPage ; GameScreen = Some extractedModel ; CurrentGame = Some extractedGame  } ->
-      Interface.GameScreen.View.root extractedGame (GameDispatcherMsg >> dispatch) extractedModel (GameScreenDispatcherMsg >> dispatch)
+      Interface.GameScreen.View.root {| Game=extractedGame ; GameDispatch=(GameDispatcherMsg >> dispatch) ; Model=extractedModel ; Dispatch=(GameScreenDispatcherMsg >> dispatch) |}
     | _ -> div [Class "textError"] [str "not found"]
   ]
   

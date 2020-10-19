@@ -106,8 +106,10 @@ module Weapons =
 module Movement =
   open Damage
 
+  let isImpulseMove (player:Player) newPosition = player.Position.GalacticPosition = newPosition.GalacticPosition
+
   let energyRequirementsForMove (player:Player) newPosition =
-    if newPosition.GalacticPosition = player.Position.GalacticPosition then
+    if isImpulseMove player newPosition then
       // we're moving within a sector
       let distance = player.Position.SectorPosition.DistanceTo newPosition.SectorPosition
       let energyCost = player.ImpulseMovementCost * (player.ImpulseDrive |> inefficiencyFactor) * distance
@@ -129,7 +131,7 @@ module Movement =
     totalEnergyGenerated
 
   let canMove (player:Player) newPosition =
-    if newPosition.GalacticPosition = player.Position.GalacticPosition then
+    if isImpulseMove player newPosition then
       (energyRequirementsForMove player newPosition) <= player.Energy.Current
     else
       let totalEnergyCost = (energyRequirementsForMove player newPosition) - (energyGeneratedByEnergyConverter player newPosition)
@@ -138,13 +140,20 @@ module Movement =
 
   let move player gameObjects newPosition =
     let energyRequirements = energyRequirementsForMove player newPosition
-    match player.Energy.Current > energyRequirements, (Position.positionIsVacant gameObjects newPosition) with
-    | true, true ->
-      Ok { player with Energy = player.Energy.Update (player.Energy.Current - energyRequirements) ; Position = newPosition } 
-    | false, _ ->
-      Error "Insufficient energy to move to that location"
-    | _, false ->
-      Error "Object blocking move"
+    if isImpulseMove player newPosition then
+      match player.Energy.Current > energyRequirements, (Position.positionIsVacant gameObjects newPosition) with
+      | true, true ->
+        Ok { player with Energy = player.Energy.Update (player.Energy.Current - energyRequirements) ; Position = newPosition } 
+      | false, _ ->
+        Error "Insufficient energy to move to that location"
+      | _, false ->
+        Error "Object blocking move"
+    else
+      match player.Energy.Current > energyRequirements with
+      | true ->
+        Ok { player with Energy = player.Energy.Update (player.Energy.Current - energyRequirements) ; Position = newPosition } 
+      | false ->
+        Error "Insufficient energy to move to that location"
 
 module Sensors =
   let discover (player:Player) alreadyFound =
