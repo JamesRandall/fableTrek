@@ -145,6 +145,7 @@ type Player =
     PhaserTemperatureCostPerGigawatt: float<celcius>
     EnergyGeneratedPerUnitOfTravel: float<gigawatt>
     EnergyCostPerUnitOfTravel: float<gigawatt>
+    HitPointsRepairedPerDay: float<hitpoints>
   }
   static member Default =
     {
@@ -176,7 +177,18 @@ type Player =
       PhaserTemperatureCostPerGigawatt = 1.5<celcius>
       EnergyGeneratedPerUnitOfTravel = 400.<gigawatt>
       EnergyCostPerUnitOfTravel = 650.<gigawatt>
+      HitPointsRepairedPerDay = 100.<hitpoints>
     }
+  member p.SystemsAsList = [
+    "Hull", p.Hull
+    "Warp Engines", p.WarpDrive
+    "Impulse Drive", p.ImpulseDrive
+    "Shield Generator", p.ShieldGenerator
+    "Deflectors", p.DeflectorDish
+    "Energy Convertor", p.EnergyConverter
+    "Phasers", p.Phasers
+    "Torpedo Launcher", p.TorpedoLaunchers
+  ]
 
 type GameObjectAttributes =
   | EnemyAttributes of Enemy
@@ -203,6 +215,16 @@ type GameDifficulty =
   | MediumDifficulty
   | HardDifficulty
 
+type AiInstruction =
+  | FirePhasersAtPlayer of float<gigawatt>
+  | ImpulseMoveTo of GameWorldPosition
+  | WarpMoveTo of GameWorldPosition
+
+type AiAction =
+  { GameObject: GameObject
+    Instruction: AiInstruction
+  }
+
 type Game =
   { Difficulty: GameDifficulty
     GameObjects: GameObject array
@@ -210,6 +232,7 @@ type Game =
     DiscoveredSectors: Position Set
     Stardate: float<stardate>
     Score: int<score>
+    AiActions: AiAction list
   }
   static member Empty = {
     Difficulty = MediumDifficulty
@@ -218,6 +241,7 @@ type Game =
     DiscoveredSectors = Set.empty
     Stardate = 2872.<stardate>
     Score = 0<score>
+    AiActions = List.empty
   }
 
 type FiringResponse =

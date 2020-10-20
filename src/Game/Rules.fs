@@ -1,7 +1,7 @@
 module Game.Rules
 
 open Types
-open Utils
+open Utils 
 
 module Enemy =
   let inline private overflowSubtract (current:^T) (value:^T) =
@@ -36,6 +36,22 @@ module Damage =
     let percentage = systemHitPoints.Percentage
     let inefficiency = 1.+(1.-System.Math.Log(percentage * 10., 10.))
     inefficiency
+
+  let systemRepairTime (player:Player) (systemHitPoints:HitPoints) =
+    let hitPointsNeedingRepair = systemHitPoints.Max - systemHitPoints.Current
+    hitPointsNeedingRepair / player.HitPointsRepairedPerDay
+
+  let totalRepairTime (player:Player) =
+    (player.SystemsAsList |> Seq.sumBy (fun (_,hp) -> hp.Max - hp.Current)) / player.HitPointsRepairedPerDay
+
+  let canRepair (game:Game) =
+    (
+      game
+      |> Game.Utils.GameWorld.currentSectorObjects
+      |> Seq.tryFind (fun go -> go.IsEnemy)
+      |> Option.isNone
+    ) && (game.Player |> totalRepairTime) > 0.
+    
 
 module Weapons =
   let canAddTarget (player:Player) (gameObject:GameObject) =
@@ -174,3 +190,29 @@ module Sensors =
       }
       |> Set.ofSeq
     alreadyFound |> Set.union newPositions
+
+
+module Turn =
+  let endPlayerTurn game =
+    // pretty dumb... just random chance based
+    let aiActions =
+      game.GameObjects
+      |> Seq.collect(fun go ->
+        let diceRoll = rollDice ()
+        if go.IsEnemy && go.Position.GalacticPosition = game.Player.Position.GalacticPosition then
+          if diceRoll < 50 then
+            [{Instruction = 100.<gigawatt> |> AiInstruction.FirePhasersAtPlayer ; GameObject = go }]
+          elif diceRoll < 80 then
+            let newPosition = Position.findRandomAndVacantSectorPosition game.GameObjects go.Position.GalacticPosition
+            [{Instruction = { game.Player.Position with SectorPosition = newPosition} |> AiInstruction.ImpulseMoveTo ; GameObject = go }]
+          else
+            []
+        else
+          []
+      )
+      |> Seq.toList
+
+
+    { game with AiActions = aiActions }
+
+ 

@@ -1,0 +1,35 @@
+.damageControl
+  position absolute
+  z-index: $popoverZIndex
+  bottom: 0
+  left: 50%
+  transform: translate3d(-50%, -42px, 0)
+  min-width: 480px
+
+  .damageControlContainer
+    background-color: $menuBackground
+    padding: 2ch
+    propertyGrid(24ch)
+
+    .damageControlFooter
+      grid-column-start: 1
+      grid-column-end: 3
+      display: flex
+      flex-direction: row
+      justify-content: space-between
+      align-items: center
+
+      button.plain
+        padding-left: $gridSpacing
+        padding-right: $gridSpacing
+
+
+  .arrowDownContainer
+    display: flex
+    justify-content: center
+    .arrowDown
+      width: 0; 
+      height: 0; 
+      border-left: 15px solid transparent
+      border-right: 15px solid transparent  
+      border-top: 15px solid $menuBackground

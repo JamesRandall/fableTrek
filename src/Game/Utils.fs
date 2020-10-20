@@ -2,6 +2,9 @@ module Game.Utils
 
 open Types
 
+let private random = System.Random()
+let rollDice () = random.Next(0,100)
+
 module GameWorld =
   let currentSectorObjects game =
     game.GameObjects |> Seq.filter (fun go -> go.Position.GalacticPosition = game.Player.Position.GalacticPosition)

@@ -24,6 +24,8 @@
     <Compile Include="Interface/GameScreen/StarField.fs" />
     <Compile Include="Interface/GameScreen/ShortRangeScanner.fs" />
     <Compile Include="Interface/GameScreen/LongRangeScanner.fs" />
+    <Compile Include="Interface/GameScreen/DamageControl.fs" />
+    <Compile Include="Interface/GameScreen/Log.fs" />
     <Compile Include="Interface/GameScreen/EnergyManagement.fs" />
     <Compile Include="Interface/GameScreen/Weapons.fs" />
     <Compile Include="Interface/GameScreen/View.fs" />

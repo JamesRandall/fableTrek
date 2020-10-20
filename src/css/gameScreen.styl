@@ -6,6 +6,22 @@
   background-repeat no-repeat
   background-position: right center
 
+  .message
+    position absolute
+    left: 50%
+    width: 50%
+    text-align: center
+    transform: translate3d(-50%,0px,0px)
+    z-index: $popoverZIndex
+    background-color: $menuBackground
+    padding: 2ch
+    top: ($gridSpacing/2)
+    border-radius: 4px
+    defaultShadow()
+
+  button.plain
+    retro-button(#222, #f33, #111)
+
   .starfield
       position absolute
       left 0
@@ -82,9 +98,6 @@
             flex-direction: column
             justify-content: center
             position relative
-
-            button.plain
-              retro-button(#222, #f33, #900)
 
       .sideBar
         overflow-y: auto

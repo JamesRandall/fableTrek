@@ -33,8 +33,11 @@ let root = FunctionComponent.Of(fun (props:{| Game:Game ; GameDispatch:GameMsg->
       fragment [] []
     // Units.Vector.renderUnitStrip
     match model.ShortRangeScannerMenuItems with | Some _ -> transparentPopoverOverlay (fun () -> HideShortRangeScannerMenu |> dispatch) | None -> fragment [] []
-    match model.IsLongRangeScannerVisible with | true -> transparentPopoverOverlay (fun () -> HideLongRangeScanner |> dispatch) | false -> fragment [] []
+    if model.IsLongRangeScannerVisible then transparentPopoverOverlay (fun () -> HideLongRangeScanner |> dispatch) else fragment [] []
+    if model.IsDamageControlVisible then transparentPopoverOverlay (fun () -> HideDamageControl |> dispatch) else fragment [] []
+    //if model.IsCaptainsLogVisible then transparentPopoverOverlay (fun () -> HideCaptainsLog |> dispatch) else fragment [] []
     div [Class "outerContainer"] [
+      if model.IsEnemyTurn then div [Class "message"] [Interface.Common.label "Enemy turn in progress"] else fragment [] []
       div [Class "innerContainer"] [
         ShortRangeScanner.view model.IsUiDisabled model.Explosions currentObjects game.Player model.ShortRangeScannerMenuItems (model.CurrentTarget) dispatch gameDispatch
         div [Class "bottomBar"] [
@@ -51,8 +54,7 @@ let root = FunctionComponent.Of(fun (props:{| Game:Game ; GameDispatch:GameMsg->
           ]
           div [Class "bottomBarButtons"] [
             div[Class "buttonContainer"] [
-              match model.IsLongRangeScannerVisible with
-              | true ->
+              if model.IsLongRangeScannerVisible then
                 LongRangeScanner.view
                   {|
                     WarpDestinationOption = model.WarpDestination
@@ -63,10 +65,13 @@ let root = FunctionComponent.Of(fun (props:{| Game:Game ; GameDispatch:GameMsg->
                     Dispatch = dispatch
                     GameDispatch = gameDispatch
                   |}
-              | false -> fragment [] []
+              else fragment [] []
               button [Class "plain" ; Disabled model.IsUiDisabled ; OnClick (fun _ -> ShowLongRangeScanner |> dispatch)] [str "Long Range"]
             ]
-            div[Class "buttonContainer"] [button [Class "plain" ; Disabled model.IsUiDisabled] [str "Damage Control"]]
+            div[Class "buttonContainer"] [
+              if model.IsDamageControlVisible then DamageControl.view game else fragment [] []
+              button [Class "plain" ; Disabled model.IsUiDisabled ; OnClick (fun _ -> ShowDamageControl |> dispatch)] [str "Damage Control"]
+            ]
             div[Class "buttonContainer"] [button [Class "plain" ; Disabled model.IsUiDisabled] [str "Log"]]
           ]
         ]

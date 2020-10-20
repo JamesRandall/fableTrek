@@ -16,6 +16,14 @@ let update msg (model:Model) game =
     { model with IsLongRangeScannerVisible = true }, Cmd.none
   | HideLongRangeScanner ->
     { model with IsLongRangeScannerVisible = false ; IsWarping = false ; WarpDestination = None }, Cmd.none
+  | ShowDamageControl ->
+    { model with IsDamageControlVisible = true }, Cmd.none
+  | HideDamageControl ->
+    { model with IsDamageControlVisible = false }, Cmd.none
+  //| ShowCaptainsLog ->
+  //  { model with IsCaptainsLogVisible = true }, Cmd.none
+  //| HideCaptainsLog ->
+  //  { model with IsCaptainsLogVisible = false }, Cmd.none
   | ShowShortRangeScannerMenu (position, menuItems) ->
     { model with ShortRangeScannerMenuItems = Some { Position = position ; MenuItems = menuItems }}, Cmd.none
   | HideShortRangeScannerMenu ->
@@ -36,5 +44,8 @@ let update msg (model:Model) game =
   | BeginWarpTo _ -> { model with IsWarping = true }, Cmd.none
   | EndWarpTo ->
     (if model.IsWarping then { model with IsWarping = false ; IsLongRangeScannerVisible = false ; WarpDestination = None } else model ), Cmd.none
-  | _ ->
+  | FirePhasersAtTarget _ ->
+    // handled by App.State - not wildcarded due to Fable Compiler issue
     model, Cmd.none
+  //| _ ->
+  //  model, Cmd.none

@@ -17,13 +17,15 @@ $propertyGridColGap = 10px
 $overlayZIndex = 10
 $popoverZIndex = 20
 $menuBackgroundOpacity = 0.8
-$menuBackground = rgba(0,0,0,0.8)
+$menuBackground = rgba(0,0,0,0.9)
 $menuBorderColor = rgba(255,255,255,$menuBackgroundOpacity)
 
+defaultShadow()
+  box-shadow: 3px 3px 3px #111
 
-propertyGrid()
+propertyGrid(labelWidth=16ch)
   display: grid
-  grid-template-columns: 16ch auto
+  grid-template-columns: labelWidth auto
   grid-auto-flow: row
   grid-row-gap: $propertyGridRowGap
   grid-column-gap: $propertyGridColGap

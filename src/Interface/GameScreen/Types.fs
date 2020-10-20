@@ -21,6 +21,9 @@ type Model =
     Explosions: Explosion list
     WarpDestination: Position option
     IsWarping: bool
+    IsDamageControlVisible: bool
+    IsCaptainsLogVisible: bool
+    IsEnemyTurn: bool
   }
   static member Empty =
     { IsUiDisabled = false
@@ -31,22 +34,32 @@ type Model =
       Explosions = List.empty
       WarpDestination = None
       IsWarping = false
+      IsDamageControlVisible = false
+      IsCaptainsLogVisible = false
+      IsEnemyTurn = false
     }
 
 type GameScreenMsg =
   | ShowLongRangeScanner
-  | HideLongRangeScanner
+  | HideLongRangeScanner  
   | ShowShortRangeScannerMenu of (GameWorldPosition*MenuItem array)
   | HideShortRangeScannerMenu
   | FirePhasers
   | FirePhasersAtNextTarget
   | FirePhasersAtTarget of GameWorldPosition
-  | ShowPhasers of GameWorldPosition
   | ShowExplosion of Explosion
-  | HidePhasers
   | DisableUi
   | EnableUi
   | SetWarpDestination of Position
   | RemoveWarpDestination
   | BeginWarpTo of Position
   | EndWarpTo
+  | ShowDamageControl
+  | HideDamageControl
+  //| ShowCaptainsLog
+  //| HideCaptainsLog
+  (*| HackHackMessage
+  | ShowDamageControl
+  | HideDamageControl
+  | ShowCaptainsLog
+  | HideCaptainsLog*)
