@@ -219,6 +219,8 @@ type AiInstruction =
   | FirePhasersAtPlayer of float<gigawatt>
   | ImpulseMoveTo of GameWorldPosition
   | WarpMoveTo of GameWorldPosition
+  | TransferToShields
+  | Recharge
 
 type AiAction =
   { GameObject: GameObject
@@ -261,6 +263,7 @@ type UpdateGameStateMsg =
   | Undock
   | FirePhasersAtPosition of GameWorldPosition
   | TargetDestroyed of GameWorldPosition
+  | BeginAiTurn
   
 type GameMsg =
   | NewGame of GameDifficulty

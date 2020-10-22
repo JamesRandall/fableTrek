@@ -65,7 +65,7 @@ let postGameUpdateMessage gameDispatcherMsg =
   match gameDispatcherMsg with
   | UpdateGameState subMsg ->
     match subMsg with
-    | WarpTo _ ->
+    | UpdateGameStateMsg.WarpTo _ ->
       Cmd.OfAsync.result (endWarpAnimation)
     | ImpulseTo _ ->
       Cmd.batch [
@@ -79,6 +79,17 @@ let postGameUpdateMessage gameDispatcherMsg =
     | _ -> Cmd.none      
   | _ -> Cmd.none
 
+// To bridge the two applications we have commands in the UI
+// that map to commands in the game.
+let mapUiCommandToGameCommand bridgeMsg uiModel game =
+  match bridgeMsg with
+  | GameBridgeMsg.ToggleShields -> 
+    Cmd.map GameDispatcherMsg (Cmd.ofMsg (UpdateGameStateMsg.ToggleShields |> UpdateGameState))
+  | GameBridgeMsg.FirePhasersAtTarget position ->
+    Cmd.map GameDispatcherMsg (Cmd.ofMsg (position |> FirePhasersAtPosition |> UpdateGameState))
+  | GameBridgeMsg.WarpTo position ->
+    Cmd.map GameDispatcherMsg ({game.Player.Position with GalacticPosition = position } |> UpdateGameStateMsg.WarpTo |> UpdateGameState |> Cmd.ofMsg)
+
 let update msg model =
   match (msg, model) with
   | (StartScreenDispatcherMsg subMsg, { StartScreen = Some extractedModel }) ->
@@ -87,15 +98,12 @@ let update msg model =
       { model with CurrentGame = difficulty |> Game.Factory.createGame |> Some }, Cmd.ofMsg (GameScreenPage |> GotoPage)        
   | (GameScreenDispatcherMsg subMsg, { GameScreen = Some extractedModel ; CurrentGame = Some extractedGame }) ->
     match subMsg with
-    | FirePhasersAtTarget position ->
-      let (subModel, subCmd) = Interface.GameScreen.State.update subMsg extractedModel extractedGame
-      model, Cmd.map GameDispatcherMsg (Cmd.ofMsg (position |> FirePhasersAtPosition |> UpdateGameState))
-    | BeginWarpTo position ->
-      let (subModel, _) = Interface.GameScreen.State.update subMsg extractedModel extractedGame
-      { model with GameScreen = Some subModel }, Cmd.map GameDispatcherMsg ({extractedGame.Player.Position with GalacticPosition = position } |> WarpTo |> UpdateGameState |> Cmd.ofMsg)
+    | GameBridge gameBridgeMsg ->
+      let cmd = mapUiCommandToGameCommand gameBridgeMsg extractedModel extractedGame
+      model, cmd
     | _ ->
-      let (subModel, subCmd) = Interface.GameScreen.State.update subMsg extractedModel extractedGame
-      { model with GameScreen = Some subModel}, Cmd.map GameScreenDispatcherMsg subCmd
+      let subModel, subCmd = Interface.GameScreen.State.update subMsg extractedModel extractedGame
+      { model with GameScreen = Some subModel}, Cmd.map GameScreenDispatcherMsg  subCmd
   | (GameDispatcherMsg subMsg, { CurrentGame = Some extractedModel }) ->
     let (subModel, subCmd) = Game.State.update subMsg extractedModel
     { model with CurrentGame = Some subModel}, Cmd.batch [

@@ -76,7 +76,7 @@ let root = FunctionComponent.Of(fun (props:{| Game:Game ; GameDispatch:GameMsg->
           ]
         ]
         div [Class "sideBar"] [
-          EnergyManagement.view {| player = game.Player |}
+          EnergyManagement.view {| player = game.Player ; dispatch = dispatch |}
           Weapons.view {| player = game.Player ; gameDispatch = gameDispatch ; gameObjects = currentObjects |}
         ]
         div [Class "fireButtons"] [

@@ -43,7 +43,7 @@ let updatePlayerState msg game =
       updatedGame, Cmd.none
     | FiringResponse.TargetMissed updatedGame ->
       updatedGame, Cmd.none
-
+  | BeginAiTurn -> (game |> Game.Rules.Turn.generateAiActions), Cmd.none
   | _ -> playerModel |> updateGameWithPlayer
 
 let update msg model =

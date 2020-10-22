@@ -5,6 +5,7 @@ open Fable.React.Props
 open Interface.Common
 open Interface.Common.Css
 open Interface.Browser.Helpers
+open Types
 
 let inline shieldColor raised arcNumber (shieldLevel:RangeValue<'t>) =
   let opacity = if raised then 1.0 else 0.4
@@ -44,7 +45,7 @@ let shields player =
     ))
   )
 
-let view = FunctionComponent.Of(fun (props:{| player:Player |}) ->
+let view = FunctionComponent.Of(fun (props:{| player:Player ; dispatch: GameScreenMsg -> unit |}) ->
   let shieldContainerSize = Hooks.useState (0,0)
   let shieldContainerRef = Hooks.useRef None
 
@@ -64,7 +65,7 @@ let view = FunctionComponent.Of(fun (props:{| player:Player |}) ->
           div [Class "labelValuePair"] [label "Aft" ; label props.player.AftShields.PercentageAsString]
           div [Class "labelValuePair"] [label "Port" ; label props.player.PortShields.PercentageAsString]
         ]
-        div [Class "shieldsContainer" ; RefHook shieldContainerRef] [
+        div [Class "shieldsContainer" ; RefHook shieldContainerRef ; Style [Opacity (if props.player.ShieldsRaised then 1.0 else 0.6)] ; OnClick (fun _ -> GameBridgeMsg.ToggleShields |> GameBridge |> props.dispatch)] [
           div [Class "shieldPlayerContainer"] [
             div [Class "shieldsPlayer"] [
               Units.Vector.Renderers.opaquePlayer true 1.0

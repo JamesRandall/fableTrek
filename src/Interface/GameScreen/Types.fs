@@ -39,6 +39,11 @@ type Model =
       IsEnemyTurn = false
     }
 
+type GameBridgeMsg =
+  | ToggleShields
+  | WarpTo of Position
+  | FirePhasersAtTarget of GameWorldPosition
+
 type GameScreenMsg =
   | ShowLongRangeScanner
   | HideLongRangeScanner  
@@ -56,6 +61,8 @@ type GameScreenMsg =
   | EndWarpTo
   | ShowDamageControl
   | HideDamageControl
+  | ToggleShields
+  | GameBridge of GameBridgeMsg
   //| ShowCaptainsLog
   //| HideCaptainsLog
   (*| HackHackMessage

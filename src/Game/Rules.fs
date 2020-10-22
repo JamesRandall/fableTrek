@@ -193,25 +193,34 @@ module Sensors =
 
 
 module Turn =
-  let endPlayerTurn game =
+  let generateAiActions game =
     // pretty dumb... just random chance based
     let aiActions =
       game.GameObjects
       |> Seq.collect(fun go ->
         let diceRoll = rollDice ()
-        if go.IsEnemy && go.Position.GalacticPosition = game.Player.Position.GalacticPosition then
-          if diceRoll < 50 then
+        let pgp = game.Player.Position.GalacticPosition
+        match go.Attributes,go.Position.GalacticPosition=pgp with
+        | EnemyAttributes enemy, true -> // an enemy in the same sector as the player
+          if diceRoll < 10 && enemy.Shields.Percentage < 0.6 then
+            [{ Instruction = AiInstruction.TransferToShields ; GameObject = go }]
+          elif diceRoll < 75 then
             [{Instruction = 100.<gigawatt> |> AiInstruction.FirePhasersAtPlayer ; GameObject = go }]
-          elif diceRoll < 80 then
+          elif diceRoll < 95 then
+            // todo - nice touch would be to move to the players weakest shield
             let newPosition = Position.findRandomAndVacantSectorPosition game.GameObjects go.Position.GalacticPosition
             [{Instruction = { game.Player.Position with SectorPosition = newPosition} |> AiInstruction.ImpulseMoveTo ; GameObject = go }]
           else
             []
-        else
-          []
+        | EnemyAttributes enemy, false -> // an enemy in a different sector to the player
+          if diceRoll < 2 then
+            let newPosition = { GalacticPosition = pgp ; SectorPosition = Position.findRandomAndVacantSectorPosition game.GameObjects pgp }
+            [{Instruction = newPosition |> AiInstruction.WarpMoveTo  ; GameObject = go }]
+          else
+            []
+        | _,_ -> []
       )
       |> Seq.toList
-
 
     { game with AiActions = aiActions }
 
