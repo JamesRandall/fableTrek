@@ -61,7 +61,6 @@ type GameScreenMsg =
   | EndWarpTo
   | ShowDamageControl
   | HideDamageControl
-  | ToggleShields
   | GameBridge of GameBridgeMsg
   //| ShowCaptainsLog
   //| HideCaptainsLog
