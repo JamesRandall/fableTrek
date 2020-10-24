@@ -39,11 +39,11 @@ let update msg (model:Model) game =
   | FirePhasersAtNextTarget ->
     match model.FiringTargets |> Seq.tryHead with
     | Some nextTarget ->
-      { model with CurrentTarget = Some nextTarget ; FiringTargets = model.FiringTargets |> Seq.skip 1 |> Seq.toList }, Cmd.ofMsg (nextTarget |> FirePhasersAtTarget)
+      { model with CurrentTarget = Some nextTarget ; FiringTargets = model.FiringTargets |> Seq.skip 1 |> Seq.toList }, Cmd.ofMsg (nextTarget |> FirePhasersAtTarget |> GameBridge)
     | None -> { model with CurrentTarget = None }, Cmd.none
-  | BeginWarpTo position -> { model with IsWarping = true }, Cmd.ofMsg (position |> GameBridgeMsg.WarpTo |> GameBridge)
+  | BeginWarpTo position -> { model with IsWarping = true ; IsUiDisabled = true }, Cmd.ofMsg (position |> GameBridgeMsg.WarpTo |> GameBridge)
   | EndWarpTo ->
-    (if model.IsWarping then { model with IsWarping = false ; IsLongRangeScannerVisible = false ; WarpDestination = None } else model ), Cmd.none
+    (if model.IsWarping then { model with IsWarping = false ; IsUiDisabled = false ; IsLongRangeScannerVisible = false ; WarpDestination = None } else model ), Cmd.none
   | GameBridge _ ->
     // handled by App.State - not wildcarded due to Fable Compiler issue and for clarity as its not necessarily obvious
     // that these are handled elsewhere

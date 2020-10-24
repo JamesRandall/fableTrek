@@ -51,7 +51,6 @@ type GameScreenMsg =
   | HideShortRangeScannerMenu
   | FirePhasers
   | FirePhasersAtNextTarget
-  | FirePhasersAtTarget of GameWorldPosition
   | ShowExplosion of Explosion
   | DisableUi
   | EnableUi

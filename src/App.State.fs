@@ -52,33 +52,6 @@ let private endWarpAnimation = async {
   return EndWarpTo |> GameScreenDispatcherMsg
 }
 
-let preGameUpdateMessage gameDispatcherMsg =
-  match gameDispatcherMsg with
-  | UpdateGameState subMsg ->
-    match subMsg with
-    | ImpulseTo _ ->
-      Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg DisableUi)
-    | _ -> Cmd.none
-  | _ -> Cmd.none
-
-let postGameUpdateMessage gameDispatcherMsg =
-  match gameDispatcherMsg with
-  | UpdateGameState subMsg ->
-    match subMsg with
-    | UpdateGameStateMsg.WarpTo _ ->
-      Cmd.OfAsync.result (endWarpAnimation)
-    | ImpulseTo _ ->
-      Cmd.batch [
-        Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg HideShortRangeScannerMenu)
-        Cmd.OfAsync.result (animationSleep ())
-      ]
-    | AddTarget _ | RemoveTarget _ ->
-      Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg HideShortRangeScannerMenu)
-    | FirePhasersAtPosition _ -> Cmd.OfAsync.result sleepThenFireNextPhasers      
-    | TargetDestroyed position -> Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg (position |> Explosion.ExplodingEnemyScout |> ShowExplosion))
-    | _ -> Cmd.none      
-  | _ -> Cmd.none
-
 // To bridge the two applications we have commands in the UI
 // that map to commands in the game.
 let mapUiCommandToGameCommand bridgeMsg uiModel game =
@@ -89,6 +62,27 @@ let mapUiCommandToGameCommand bridgeMsg uiModel game =
     Cmd.map GameDispatcherMsg (Cmd.ofMsg (position |> FirePhasersAtPosition |> UpdateGameState))
   | GameBridgeMsg.WarpTo position ->
     Cmd.map GameDispatcherMsg ({game.Player.Position with GalacticPosition = position } |> UpdateGameStateMsg.WarpTo |> UpdateGameState |> Cmd.ofMsg)
+
+let mapGameCommandToUiCommand returnedCmd gameCmd =
+  match gameCmd with
+  | GameEvent bridgeMsg ->
+    match bridgeMsg with
+    | GameEventMsg.FiredPhasersAtTarget ->
+      Cmd.OfAsync.result sleepThenFireNextPhasers
+    | TargetDestroyed position -> Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg (position |> Explosion.ExplodingEnemyScout |> ShowExplosion))
+    | PlayerImpulsed _ -> Cmd.batch [
+        Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg HideShortRangeScannerMenu)
+        Cmd.OfAsync.result (animationSleep ())
+      ]
+    | PlayerWarped _ ->
+      Cmd.OfAsync.result (endWarpAnimation)
+  // this last bit just makes the short range scanner overlay disappear for those commands that don't warrant eventing
+  | UpdateGameState gameStateMsg ->
+    match gameStateMsg with
+    | AddTarget _ | RemoveTarget _ ->
+        Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg HideShortRangeScannerMenu)
+    | _ -> Cmd.map GameDispatcherMsg returnedCmd
+  | _ -> Cmd.map GameDispatcherMsg returnedCmd
 
 let update msg model =
   match (msg, model) with
@@ -106,11 +100,7 @@ let update msg model =
       { model with GameScreen = Some subModel}, Cmd.map GameScreenDispatcherMsg  subCmd
   | (GameDispatcherMsg subMsg, { CurrentGame = Some extractedModel }) ->
     let (subModel, subCmd) = Game.State.update subMsg extractedModel
-    { model with CurrentGame = Some subModel}, Cmd.batch [
-      preGameUpdateMessage subMsg
-      Cmd.map GameDispatcherMsg subCmd
-      postGameUpdateMessage subMsg
-    ] 
+    { model with CurrentGame = Some subModel}, (subMsg |> mapGameCommandToUiCommand subCmd)
   | GotoPage page,_ ->
     page |> Router.modifyLocation
     model, Cmd.none

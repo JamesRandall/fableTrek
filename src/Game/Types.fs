@@ -251,6 +251,12 @@ type FiringResponse =
   | TargetDestroyed of Game
   | TargetMissed of Game
 
+type GameEventMsg =
+  | FiredPhasersAtTarget
+  | TargetDestroyed of GameWorldPosition
+  | PlayerWarped of bool // did it succeed
+  | PlayerImpulsed of bool // did it succeed
+
 type UpdateGameStateMsg =
   | SetPhaserPower of float<gigawatt>
   | SetWarpSpeed of float<warp>
@@ -262,9 +268,9 @@ type UpdateGameStateMsg =
   | Dock of GameWorldPosition
   | Undock
   | FirePhasersAtPosition of GameWorldPosition
-  | TargetDestroyed of GameWorldPosition
   | BeginAiTurn
   
 type GameMsg =
   | NewGame of GameDifficulty
   | UpdateGameState of UpdateGameStateMsg
+  | GameEvent of GameEventMsg

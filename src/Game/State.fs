@@ -11,40 +11,40 @@ let appendToCaptainsLog player logItem =
 
 let updatePlayerState msg game =
   let playerModel = game.Player
-  let updateGameWithPlayer player = { game with Player = player }, Cmd.none
+  let updateGameWithPlayer cmd player = ({ game with Player = player }, cmd)
   match msg with
-  | ToggleShields -> { playerModel with ShieldsRaised = not(playerModel.ShieldsRaised)} |> updateGameWithPlayer
-  | SetPhaserPower newPower -> { playerModel with PhaserPower = playerModel.PhaserPower.Update newPower } |> updateGameWithPlayer
-  | SetWarpSpeed newSpeed -> { playerModel with WarpSpeed = playerModel.WarpSpeed.Update newSpeed } |> updateGameWithPlayer
+  | ToggleShields -> { playerModel with ShieldsRaised = not(playerModel.ShieldsRaised)} |> updateGameWithPlayer Cmd.none
+  | SetPhaserPower newPower -> { playerModel with PhaserPower = playerModel.PhaserPower.Update newPower } |> updateGameWithPlayer Cmd.none
+  | SetWarpSpeed newSpeed -> { playerModel with WarpSpeed = playerModel.WarpSpeed.Update newSpeed } |> updateGameWithPlayer Cmd.none
   | ImpulseTo newPosition ->  
     match Game.Rules.Movement.move playerModel game.GameObjects newPosition with
-    | Ok newPlayer -> newPlayer |> updateGameWithPlayer
-    | Error errorMessage -> (errorMessage |> Warning |> appendToCaptainsLog playerModel) |> updateGameWithPlayer
+    | Ok newPlayer -> newPlayer |> updateGameWithPlayer (Cmd.ofMsg (true |> GameEventMsg.PlayerImpulsed |> GameEvent))
+    | Error errorMessage -> (errorMessage |> Warning |> appendToCaptainsLog playerModel) |> updateGameWithPlayer (Cmd.ofMsg (false |> GameEventMsg.PlayerImpulsed |> GameEvent))
   | WarpTo newPosition ->  
     match Game.Rules.Movement.move playerModel game.GameObjects newPosition with
-    | Ok newPlayer -> { game with Player = newPlayer ; DiscoveredSectors = game.DiscoveredSectors |> Game.Rules.Sensors.discover newPlayer }, Cmd.none
-    | Error errorMessage -> (errorMessage |> Warning |> appendToCaptainsLog playerModel) |> updateGameWithPlayer
+    | Ok newPlayer -> { game with Player = newPlayer ; DiscoveredSectors = game.DiscoveredSectors |> Game.Rules.Sensors.discover newPlayer }, Cmd.ofMsg (true |> GameEventMsg.PlayerWarped |> GameEvent)
+    | Error errorMessage -> (errorMessage |> Warning |> appendToCaptainsLog playerModel) |> updateGameWithPlayer (Cmd.ofMsg (false |> GameEventMsg.PlayerWarped |> GameEvent))
   | AddTarget position ->
     match Utils.GameWorld.objectAtPosition game.GameObjects position with
     | Some gameObject ->
       match addTarget playerModel gameObject with
-      | Ok newPlayer -> newPlayer |> updateGameWithPlayer
-      | Error errorMessage -> (errorMessage |> Warning |> appendToCaptainsLog playerModel) |> updateGameWithPlayer
-    | None -> playerModel |> updateGameWithPlayer
+      | Ok newPlayer -> newPlayer |> updateGameWithPlayer Cmd.none
+      | Error errorMessage -> (errorMessage |> Warning |> appendToCaptainsLog playerModel) |> updateGameWithPlayer Cmd.none
+    | None -> playerModel |> updateGameWithPlayer Cmd.none
   | RemoveTarget position ->
     match removeTarget playerModel position with
-    | Ok newPlayer -> newPlayer |> updateGameWithPlayer
-    | Error errorMessage -> (errorMessage |> Warning |> appendToCaptainsLog playerModel)|> updateGameWithPlayer
+    | Ok newPlayer -> newPlayer |> updateGameWithPlayer Cmd.none
+    | Error errorMessage -> (errorMessage |> Warning |> appendToCaptainsLog playerModel)|> updateGameWithPlayer Cmd.none
   | FirePhasersAtPosition position ->
     match firePhasers game position with
     | FiringResponse.TargetDestroyed updatedGame ->
-      updatedGame, Cmd.ofMsg (position |> UpdateGameStateMsg.TargetDestroyed |> UpdateGameState)
+      updatedGame, Cmd.ofMsg (position |> GameEventMsg.TargetDestroyed |> GameEvent)
     | FiringResponse.TargetDamaged updatedGame ->
-      updatedGame, Cmd.none
+      updatedGame, Cmd.ofMsg (GameEventMsg.FiredPhasersAtTarget |> GameEvent)
     | FiringResponse.TargetMissed updatedGame ->
-      updatedGame, Cmd.none
+      updatedGame, Cmd.ofMsg (GameEventMsg.FiredPhasersAtTarget |> GameEvent)
   | BeginAiTurn -> (game |> Game.Rules.Turn.generateAiActions), Cmd.none
-  | _ -> playerModel |> updateGameWithPlayer
+  | _ -> playerModel |> updateGameWithPlayer Cmd.none
 
 let update msg model =
   match msg with
@@ -52,3 +52,4 @@ let update msg model =
     difficulty |> createGame, Cmd.none
   | UpdateGameState subMsg -> 
     updatePlayerState subMsg model
+  | GameEvent _ -> model, Cmd.none
