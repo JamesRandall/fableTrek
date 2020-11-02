@@ -54,22 +54,23 @@ let private endWarpAnimation = async {
 
 // To bridge the two applications we have commands in the UI
 // that map to commands in the game.
-let mapUiCommandToGameCommand bridgeMsg uiModel game =
-  match bridgeMsg with
-  | GameBridgeMsg.ToggleShields -> 
+let mapUiRequestToGameCommand requestMsg uiModel game =
+  match requestMsg with
+  | GameRequestMsg.ToggleShields -> 
     Cmd.map GameDispatcherMsg (Cmd.ofMsg (UpdateGameStateMsg.ToggleShields |> UpdateGameState))
-  | GameBridgeMsg.FirePhasersAtTarget position ->
+  | GameRequestMsg.FirePhasersAtTarget position ->
     Cmd.map GameDispatcherMsg (Cmd.ofMsg (position |> FirePhasersAtPosition |> UpdateGameState))
-  | GameBridgeMsg.WarpTo position ->
+  | GameRequestMsg.WarpTo position ->
     Cmd.map GameDispatcherMsg ({game.Player.Position with GalacticPosition = position } |> UpdateGameStateMsg.WarpTo |> UpdateGameState |> Cmd.ofMsg)
 
-let mapGameCommandToUiCommand returnedCmd gameCmd =
+let mapGameEventToUiCommand returnedCmd gameCmd =
   match gameCmd with
   | GameEvent bridgeMsg ->
     match bridgeMsg with
     | GameEventMsg.FiredPhasersAtTarget ->
       Cmd.OfAsync.result sleepThenFireNextPhasers
-    | TargetDestroyed position -> Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg (position |> Explosion.ExplodingEnemyScout |> ShowExplosion))
+    | TargetDestroyed position ->
+      Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg (position |> Explosion.ExplodingEnemyScout |> ShowExplosion))
     | PlayerImpulsed _ -> Cmd.batch [
         Cmd.map GameScreenDispatcherMsg (Cmd.ofMsg HideShortRangeScannerMenu)
         Cmd.OfAsync.result (animationSleep ())
@@ -92,15 +93,15 @@ let update msg model =
       { model with CurrentGame = difficulty |> Game.Factory.createGame |> Some }, Cmd.ofMsg (GameScreenPage |> GotoPage)        
   | (GameScreenDispatcherMsg subMsg, { GameScreen = Some extractedModel ; CurrentGame = Some extractedGame }) ->
     match subMsg with
-    | GameBridge gameBridgeMsg ->
-      let cmd = mapUiCommandToGameCommand gameBridgeMsg extractedModel extractedGame
+    | GameRequest requestMsg ->
+      let cmd = mapUiRequestToGameCommand requestMsg extractedModel extractedGame
       model, cmd
     | _ ->
       let subModel, subCmd = Interface.GameScreen.State.update subMsg extractedModel extractedGame
       { model with GameScreen = Some subModel}, Cmd.map GameScreenDispatcherMsg  subCmd
   | (GameDispatcherMsg subMsg, { CurrentGame = Some extractedModel }) ->
     let (subModel, subCmd) = Game.State.update subMsg extractedModel
-    { model with CurrentGame = Some subModel}, (subMsg |> mapGameCommandToUiCommand subCmd)
+    { model with CurrentGame = Some subModel}, (subMsg |> mapGameEventToUiCommand subCmd)
   | GotoPage page,_ ->
     page |> Router.modifyLocation
     model, Cmd.none

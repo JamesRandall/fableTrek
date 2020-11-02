@@ -39,7 +39,7 @@ type Model =
       IsEnemyTurn = false
     }
 
-type GameBridgeMsg =
+type GameRequestMsg =
   | ToggleShields
   | WarpTo of Position
   | FirePhasersAtTarget of GameWorldPosition
@@ -52,6 +52,7 @@ type GameScreenMsg =
   | FirePhasers
   | FirePhasersAtNextTarget
   | ShowExplosion of Explosion
+  | CompleteExplosion of Explosion
   | DisableUi
   | EnableUi
   | SetWarpDestination of Position
@@ -60,11 +61,4 @@ type GameScreenMsg =
   | EndWarpTo
   | ShowDamageControl
   | HideDamageControl
-  | GameBridge of GameBridgeMsg
-  //| ShowCaptainsLog
-  //| HideCaptainsLog
-  (*| HackHackMessage
-  | ShowDamageControl
-  | HideDamageControl
-  | ShowCaptainsLog
-  | HideCaptainsLog*)
+  | GameRequest of GameRequestMsg

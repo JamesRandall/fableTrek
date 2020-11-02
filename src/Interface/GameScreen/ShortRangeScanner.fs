@@ -122,12 +122,14 @@ let view isUiDisabled (explosions:Explosion list) (gameObjects:GameObject array)
     |> Seq.map (fun explosion ->
       match explosion with
       | ExplodingEnemyScout position ->
-        div [Class "explosion" ; Style [getLeft position.SectorPosition.X ; getTop position.SectorPosition.Y ; cssWidth ; cssHeight ]] [
+        // The key is important here - if we have a sequence of explosions then React may reuse
+        // the element it created for the previous explosion and this means the transition will not run - the element
+        // will already be in a transitioned state. 
+        // Using key and giving it a unique ID forces React to generate a new element each time.
+        div [Class "explosion" ; Key (System.Guid.NewGuid().ToString()) ; Style [getLeft position.SectorPosition.X ; getTop position.SectorPosition.Y ; cssWidth ; cssHeight ]] [
           div [Style [Height "80%" ; Width "80%"]] [Units.Pixelated.Scout.pixelatedScout ({| dispatch = (fun _ -> ()) |})]
         ]
     )
-
-  
   
   let overlayGrid =
     let gridTemplateRows = (Seq.replicate numberOfRows (sprintf "%s " gridHeightPercentageAsString)) |> Seq.toArray |> Array.fold (+) ""

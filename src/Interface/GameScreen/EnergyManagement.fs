@@ -65,7 +65,7 @@ let view = FunctionComponent.Of(fun (props:{| player:Player ; dispatch: GameScre
           div [Class "labelValuePair"] [label "Aft" ; label props.player.AftShields.PercentageAsString]
           div [Class "labelValuePair"] [label "Port" ; label props.player.PortShields.PercentageAsString]
         ]
-        div [Class "shieldsContainer" ; RefHook shieldContainerRef ; Style [Opacity (if props.player.ShieldsRaised then 1.0 else 0.6)] ; OnClick (fun _ -> GameBridgeMsg.ToggleShields |> GameBridge |> props.dispatch)] [
+        div [Class "shieldsContainer" ; RefHook shieldContainerRef ; Style [Opacity (if props.player.ShieldsRaised then 1.0 else 0.6)] ; OnClick (fun _ -> GameRequestMsg.ToggleShields |> GameRequest |> props.dispatch)] [
           div [Class "shieldPlayerContainer"] [
             div [Class "shieldsPlayer"] [
               Units.Vector.Renderers.opaquePlayer true 1.0

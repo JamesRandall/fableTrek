@@ -12,56 +12,24 @@ let pixelatedScout = FunctionComponent.Of (fun (props:{| dispatch:GameScreenMsg-
   let width = 92
   let height = 90
 
+  let groupId = Hooks.useState (System.Guid.NewGuid().ToString())
+
   Hooks.useEffect((fun () ->
-    let explodingScouts = Browser.Dom.document.querySelectorAll(".explodingScout")
+    let explodingScout = Browser.Dom.document.getElementById groupId.current
     let random = System.Random()
     let randomX () = sprintf "%dpx" (random.Next(width*2)-width)
     let randomY () = sprintf "%dpx" (random.Next(height*2)-height)
-    {0..(explodingScouts.length-1)}
-    |> Seq.iter (fun scoutIndex ->
-      let scout = explodingScouts.Item scoutIndex
-      {0..(scout.childNodes.length-1)}
-      |> Seq.iter (fun pixelIndex ->
-        let pixel = scout.childNodes.Item pixelIndex
-        pixel?style?opacity <- 0.0
-        pixel?style?transform <- (sprintf "translate3d(%s,%s,0)" (randomX()) (randomY()))
-      )
+    {0..(explodingScout.childNodes.length-1)}
+    |> Seq.iter (fun pixelIndex ->
+      let pixel = explodingScout.childNodes.Item pixelIndex
+      ()
+      pixel?style?opacity <- 0.0
+      pixel?style?transform <- (sprintf "translate3d(%s,%s,0)" (randomX()) (randomY()))
     )
   ), [||])
-
-  (*Fable.Core.JS.setTimeout (fun _ ->    
-    let explodingScouts = Browser.Dom.document.querySelectorAll(".explodingScout")
-    let random = System.Random()
-    let randomX () = sprintf "%dpx" (random.Next(width*2)-width)
-    let randomY () = sprintf "%dpx" (random.Next(height*2)-height)
-    {0..(explodingScouts.length-1)}
-    |> Seq.iter (fun scoutIndex ->
-      let scout = explodingScouts.Item scoutIndex
-      {0..(scout.childNodes.length-1)}
-      |> Seq.iter (fun pixelIndex ->
-        let pixel = scout.childNodes.Item pixelIndex
-        pixel?style?opacity <- 0.0
-        pixel?style?transform <- (sprintf "translate3d(%s,%s,0)" (randomX()) (randomY()))
-      )
-    )
-  ) 2000 |> ignore*)
-
-(*
-      let sc = explodingScouts.Item scoutIndex
-      {0..(sc.childNodes.length-1)}
-      |> Seq.iter (fun i ->
-        let item = sc.childNodes.Item i
-        item?style?transform <- "translateX(30px)"
-        // Fable.Core.JS.console.log("translating")
-      )
-      //sc?style?transform = "translate3d(30px,10px,0)" |> ignore
-      //sc?style?transform = "translate3d(30px,10px,0)" |> ignore
-    ) 2000 |> ignore
-  )    
-*)
-
+  
   pixelatedUnitSvg width height  [|
-    g [Class "explodingScout"] [|
+    g [Class "explodingScout" ; Id groupId.current] [|
       rect [SVGAttr.X "46" ; SVGAttr.Y "0" ; SVGAttr.Width "2" ; SVGAttr.Height "2" ; SVGAttr.Fill "rgba(255,0,0,255)"][]
       rect [SVGAttr.X "48" ; SVGAttr.Y "0" ; SVGAttr.Width "2" ; SVGAttr.Height "2" ; SVGAttr.Fill "rgba(1,0,0,255)"][]
       rect [SVGAttr.X "44" ; SVGAttr.Y "2" ; SVGAttr.Width "2" ; SVGAttr.Height "2" ; SVGAttr.Fill "rgba(255,0,0,255)"][]
