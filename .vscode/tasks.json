@@ -13,16 +13,16 @@
         },
         {
             "label": "Watch Client",
-            "command": "npm",
-            "args": [ "run", "start" ],
+            "command": "dotnet",
+            "args": [ "fable", "watch", "src", "--outDir", "build", "--run", "webpack-dev-server" ],
             "type": "shell",
-            "options": {
-                "cwd": "${workspaceFolder}",
-                "env": {
-                    "vsCodeSession": "true",
-                    "safeClientOnly": "true"
-                }
-            },
+            //"options": {
+            //    "cwd": "${workspaceFolder}",
+            //    "env": {
+            //        "vsCodeSession": "true",
+            //        "safeClientOnly": "true"
+            //    }
+            //},
             "group": "build",
             "isBackground": true,
             "problemMatcher": {

@@ -36,7 +36,7 @@ var commonPlugins = [
 module.exports = {
     mode: "development",
     devtool: 'eval-source-map',
-    entry: "./src/App.fsproj",
+    entry: "./build/App.js",
     output: {
         path: path.join(__dirname, isProduction ? CONFIG.outputDir : CONFIG.debugDir),
         filename: isProduction ? 'bundle.[hash].js' : 'bundle.js'
@@ -52,10 +52,6 @@ module.exports = {
     },
     module: {
         rules: [{
-            test: /\.fs(x|proj)?$/,
-            use: "fable-loader"
-        },
-        {
             test: /\.styl$/,
             // compiles Styl to CSS
             use: [
