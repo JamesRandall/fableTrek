@@ -300,3 +300,4 @@ deploy
 
 # Fable output
 *.fs.js
+build
